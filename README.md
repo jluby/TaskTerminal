@@ -1,4 +1,4 @@
-# Task Tracking with Command Line Tools
+# Task Tracking and Management with Command Line Tools and Simple Automation
 
 ## Project Overview
 This project seeks to provide utilities for task tracking. Tasks are seperated by project. The core utilities of this project are:
