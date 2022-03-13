@@ -9,12 +9,12 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
 
 ## Repository Structure
  * `/project`: Scripts which run necessary code for data build and model training.
- * `/src`: `ekg_scd` package, contains helpers and classes necessary for `/project` scripts.
+ * `/src`: `task_tracker` package, contains helpers and classes necessary for `/project` scripts.
 
 ## Package Installation
- To install the `ekg_scd` package:
+ To install the `task_tracker` package:
  1. Clone this repository. 
  2. From the base directory, run `pip install .` from the command line.
 
 ## Current Maintainers
- * Jack Luby, UChicago Booth Center for Applied AI - john.luby@chicagobooth.edu
+ * Jack Luby, UChicago Booth Center for Applied AI - jack.o.luby@gmail.com
