@@ -3,4 +3,4 @@ PACKAGE_DIR = src
 PROJECT_DIR = project
 
 # testing vars
-LINTING_LINELENGTH = 120
+LINTING_LINELENGTH = 79
