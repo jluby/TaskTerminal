@@ -13,23 +13,17 @@ project_list = os.listdir("projects")
 # establish parser to pull in projects to view
 parser = argparse.ArgumentParser(description="Input project to view.")
 parser.add_argument(
-    "proj", type=str, nargs="?", default=None, help="projects to display"
+    "proj", type=str, nargs="?", default="", help="projects to display"
 )
 proj = vars(parser.parse_args())["proj"]
 
-if proj is None:
-    while proj not in project_list and proj != "":
-        proj = input(
-            f"""Please specify a project or, to show all projects, press Enter.\nAvailable projects are {project_list}:\n\n"""
-        )
-
-if proj not in project_list and proj != "":
+if len(project_list) == 0:
     raise ValueError(
-        f"\n\t'{proj}' is not a valid directory.\n\tTo create a new directory, run {templates['add_template']}"
+        f"\n\tNo projects created.\n\tTo create a new directory, run {templates['add_template']}"
     )
-if proj == "" and len(project_list) == 0:
+elif proj not in project_list and proj != "":
     raise ValueError(
-        f"\n\tNo projects available.\n\tTo create a new directory, run {templates['add_template']}"
+        f"\n\t'{proj}' is not a valid project.\n\tAvailable projects are {project_list}.\n\tTo create a new project directory, run {templates['add_template']}"
     )
 
 if proj == "":
