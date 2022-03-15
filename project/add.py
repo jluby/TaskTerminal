@@ -7,6 +7,8 @@ import os
 
 import pandas as pd
 
+from task_tracker.helpers import move
+
 # establish parameters
 templates = json.load(open("templates.json"))
 if os.path.exists("projects/.DS_Store"):
@@ -79,14 +81,6 @@ def define_idx(pos) -> int:
         return -1
     else:
         return pos
-
-
-def move(df: pd.DataFrame, from_index: int, to_index: int) -> pd.DataFrame:
-    idx = list(df.index)
-    idx.remove(idx[from_index])
-    to_index = to_index if to_index != -1 else len(idx)
-    idx.insert(to_index, from_index)
-    return df.iloc[idx].reset_index(drop=True)
 
 
 proj_str = d["proj"] if d["proj"] else d["add_proj"]
