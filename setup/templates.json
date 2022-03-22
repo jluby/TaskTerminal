@@ -1,0 +1,6 @@
+{"add_template": "'addproj PROJECT-NAME'",
+"rm_proj_template": "'delproj PROJECT-NAME'",
+"rm_entry_template": "'del PROJECT-NAME LIST IDX'",
+"list_proj_and_type": "'show PROJECT-NAME LIST'",
+"hide_project": "'hideproj PROJECT-NAME'",
+"unhide_project": "'hideproj -u PROJECT-NAME'"}
