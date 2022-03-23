@@ -84,7 +84,7 @@ def main():
         while type(time_estimate) is not float:
             with suppress(ValueError):
                 time_estimate = float(
-                    input(f"{halftab}How long will this take?\n\t")
+                    input(f"{halftab}How long will this take (in hours)?\n\t")
                 )
         df.loc[len(df)] = [
             entry,
