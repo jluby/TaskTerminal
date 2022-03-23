@@ -2,6 +2,7 @@
 import json
 import os
 from pathlib import Path
+from termcolor import colored
 
 import pandas as pd
 
@@ -17,7 +18,7 @@ def check_init():
         os.makedirs(f"{data_path}/projects")
 
 
-def print_special(string: str, n_tab: int = 1) -> None:
+def print_special(string: str, n_tab: int = 1, flagged: bool = False) -> None:
     lines = [l.strip() for l in string.split(sep="|")]
     print("\t" + lines[0])
     [print("\t" * n_tab + l) for l in lines[1:]]
@@ -28,9 +29,8 @@ def print_entries(df: pd.DataFrame) -> None:
     print("-" * 40)
     if len(df) > 0:
         for i, row in enumerate(df.to_dict("records")):
-            print_special(f"{i}\t{row['entry']}", n_tab=2)
-    else:
-        print("\tEMPTY")
+            entry = colored(row["entry"],"red",attrs=["bold"]) if row["flagged"] else row["entry"]
+            print_special(f"{i}\t{entry}", n_tab=2, flagged=row['flagged'])
     print("-" * 40)
 
 

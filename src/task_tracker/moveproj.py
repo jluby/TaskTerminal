@@ -33,16 +33,15 @@ def main():
     )
     d = vars(parser.parse_args())
 
-    def main():
-        from_idx = define_idx(d["from"])
-        to_idx = define_idx(d["to"])
-        proj_to_move = project_list[from_idx]
-        del project_list[from_idx]
-        project_list.insert(to_idx, proj_to_move)
-        json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
-        print(
-            f"\tProject {proj_to_move} successfully moved from position {from_idx} to position {to_idx}."
-        )
+    from_idx = define_idx(d["from"])
+    to_idx = define_idx(d["to"])
+    proj_to_move = project_list[from_idx]
+    del project_list[from_idx]
+    project_list.insert(to_idx, proj_to_move)
+    json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
+    print(
+        f"\tProject {proj_to_move} successfully moved from position {from_idx} to position {to_idx}."
+    )
 
 
 if __name__ == "__main__":

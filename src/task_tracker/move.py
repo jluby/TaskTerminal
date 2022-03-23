@@ -73,7 +73,7 @@ def main():
     df = pd.read_csv(path)
     entry = df.loc[from_idx, "entry"]
     df = move(df, from_index=from_idx, to_index=to_idx)
-    df.to_csv(path)
+    df.to_csv(path, index=False)
     print(
         f"\tEntry {entry} successfully moved from position {from_idx} to position {to_idx}."
     )

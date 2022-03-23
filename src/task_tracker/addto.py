@@ -37,14 +37,13 @@ def main():
         help="Project list to which entry will be added.",
     )
     parser.add_argument(
-        "--pos",
+        "pos",
         nargs="?",
-        required=False,
         default="HEAD",
         help="Position at which to add entry. Accepted arguments are zero / positive integer indices, 'HEAD', and 'TAIL'.",
     )
     parser.add_argument(
-        "--flag",
+        "-flag",
         action=argparse.BooleanOptionalAction,
         default=False,
         help="If provided, flag as important.",

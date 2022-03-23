@@ -78,7 +78,7 @@ def main():
         archive_path = f"{data_path}/projects/{d['ref_proj']}/archives/{d['entry_type']}s.csv"
         archive_df = pd.read_csv(archive_path)
         archive_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        archive_df.loc[len(archive_df)] = to_be_archived.tolist() + [
+        archive_df.loc[len(archive_df)] = to_be_archived.tolist()[1:] + [
             archive_time
         ]
         archive_df.to_csv(archive_path, index=False)

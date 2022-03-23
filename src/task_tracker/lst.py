@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Display contents of list."""
 
+# TODO: maybe color flagged items?
+
 # base imports
 import argparse
 import json
-from pathlib import Path
 
 import pandas as pd
 
@@ -24,7 +25,7 @@ templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 hidden_list = json.load(open(f"{data_path}/hidden_project_list.json", "r"))
 project_list = [p for p in project_list if p not in hidden_list]
-lists = ["notes", "note", "tasks", "task", "refs", "ref", "archives"]
+lists = ["notes", "note", "tasks", "task", "refs", "ref"]
 
 
 def main():
@@ -53,10 +54,16 @@ def main():
         help="Position of item within list for which to display description.",
     )
     parser.add_argument(
-        "--flagged",
+        "-flagged",
         action=argparse.BooleanOptionalAction,
         default=False,
         help="If provided, list only flagged entries.",
+    )
+    parser.add_argument(
+        "-arc",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="If provided, show archives.",
     )
     d = vars(parser.parse_args())
 
@@ -79,6 +86,8 @@ def main():
 
     if d["file"][-1] != "s":
         d["file"] += "s"
+    if d["arc"] == True:
+        d["file"] = f"archives/{d['file']}"
 
     if d["ref_proj"] == "ALL":
         for proj in project_list:
