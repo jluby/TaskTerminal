@@ -1,5 +1,19 @@
 # base imports
+import os
+import json
 import pandas as pd
+
+from pathlib import Path
+
+pkg_path = Path(__file__).parents[1]
+data_path = f"{pkg_path}/.package_data"
+
+def check_init():
+    if not os.path.isdir(data_path):
+        os.makedirs(data_path)
+        json.dump([], open(f"{data_path}/project_list.json", "w"))
+        json.dump([], open(f"{data_path}/hidden_project_list.json", "w"))
+        os.makedirs(f"{data_path}/projects")
 
 def print_special(string: str, n_tab: int = 1) -> None:
     lines = [l.strip() for l in string.split(sep="|")]
@@ -34,3 +48,4 @@ def move(df: pd.DataFrame, from_index: int, to_index: int) -> pd.DataFrame:
     to_index = to_index if to_index != -1 else len(idx)
     idx.insert(to_index, from_index)
     return df.iloc[idx].reset_index(drop=True)
+    

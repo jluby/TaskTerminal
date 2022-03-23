@@ -8,8 +8,7 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
     - Upon storage, tasks can additionally be flagged for importance if likely to be needed in the future
 
 ## Repository Structure
- * `/project`: Scripts which run necessary code for data build and model training.
- * `/src`: `task_tracker` package, contains helpers and classes necessary for `/project` scripts.
+ * `/src`: `task_tracker` package, contains CLI scripts and helpers.
 
 ## Package Installation
  To install the `task_tracker` package:

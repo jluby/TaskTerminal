@@ -8,15 +8,14 @@ MAKEFILE_PATH := $(abspath $(firstword $(MAKEFILE_LIST)))
 MAKEFILE_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 # required values, set to defaults here if not given in config.mk
-PACKAGE_DIR ?= src
-PROJECT_DIR ?= project
+PACKAGE_DIR ?= task_tracker
 LINTING_LINELENGTH ?= 120
 PYTHON ?= python3
 CODECOV_TOKEN ?= ${CODECOV_TOKEN}
 
 # firm variables, usually the same but potentially require editing for current repo
-CLEAN_DIR_LIST_INCLUDED = $(PACKAGE_DIR) $(PROJECT_DIR)
-CLEAN_DIR_REGEX_INCLUDED = $(PACKAGE_DIR)|$(PROJECT_DIR)
+CLEAN_DIR_LIST_INCLUDED = $(PACKAGE_DIR)
+CLEAN_DIR_REGEX_INCLUDED = $(PACKAGE_DIR)
 
 
 # use regex to go through this Makefile and print help lines
