@@ -4,13 +4,19 @@
 # base imports
 import argparse
 import json
-import os
-from datetime import datetime
 from contextlib import suppress
+from datetime import datetime
 
 import pandas as pd
 
-from .helpers.helpers import check_init, data_path, define_idx, move, pkg_path
+from .helpers.helpers import (
+    check_init,
+    data_path,
+    define_idx,
+    halftab,
+    move,
+    pkg_path,
+)
 
 check_init()
 
@@ -52,17 +58,17 @@ def main():
 
     if d["pos"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
         raise ValueError(
-            f"\n\t'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100."
+            f"\n{halftab}'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100."
         )
     if len(project_list) == 0:
         raise ValueError(
-            f"\n\tNo projects yet created.\n\tTo create a new project, run {templates['add_template']}."
+            f"\n{halftab}No projects yet created.\n{halftab}To create a new project, run {templates['add_template']}."
         )
     if not d["ref_proj"]:
-        raise ValueError(f"\n\t'ref_proj' must be provided.")
+        raise ValueError(f"\n{halftab}'ref_proj' must be provided.")
     if d["ref_proj"] not in project_list:
         raise ValueError(
-            f"\n\t'{d['ref_proj']}' is not a valid project.\n\tAvailable projects are {project_list}."
+            f"\n{halftab}'{d['ref_proj']}' is not a valid project.\n{halftab}Available projects are {project_list}."
         )
 
     path = f"{data_path}/projects/{d['ref_proj']}/{d['entry_type']}s.csv"
@@ -70,20 +76,28 @@ def main():
     entry = ""
     description = ""
     while entry == "":
-        entry = input(f"\tProvide {d['entry_type']}:\n\t\t")
-    description = input(f"\tDescribe {d['entry_type']}:\n\t\t")
+        entry = input(f"{halftab}Provide {d['entry_type']}:\n\t")
+    description = input(f"{halftab}Describe {d['entry_type']}:\n\t")
     entry_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     if d["entry_type"] == "task":
         time_estimate = ""
         while type(time_estimate) is not float:
             with suppress(ValueError):
-                time_estimate = float(input(f"\tHow long will this take?\n\t\t"))
-        df.loc[len(df)] = [entry, description, time_estimate, d["flag"], entry_time]
+                time_estimate = float(
+                    input(f"{halftab}How long will this take?\n\t")
+                )
+        df.loc[len(df)] = [
+            entry,
+            description,
+            time_estimate,
+            d["flag"],
+            entry_time,
+        ]
     else:
         df.loc[len(df)] = [entry, description, d["flag"], entry_time]
     df = move(df, from_index=-1, to_index=define_idx(d["pos"]))
     df.to_csv(path, index=False)
-    print(f"\t{d['entry_type'].capitalize()} added successfully.")
+    print(f"{halftab}{d['entry_type'].capitalize()} added successfully.")
 
 
 if __name__ == "__main__":

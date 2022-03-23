@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Display contents of list."""
 
-# TODO: maybe color flagged items?
-
 # base imports
 import argparse
 import json
@@ -13,6 +11,7 @@ from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
+    halftab,
     pkg_path,
     print_description,
     print_entries,
@@ -69,19 +68,19 @@ def main():
 
     if d["pos"] and d["ref_proj"] == "ALL":
         raise ValueError(
-            f"\n\tUse of 'pos' kwarg requires specification of a single project."
+            f"\n{halftab}Use of 'pos' kwarg requires specification of a single project."
         )
     if d["pos"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
         raise ValueError(
-            f"\n\t'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100."
+            f"\n{halftab}'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100."
         )
     if len(project_list) == 0:
         raise ValueError(
-            f"\n\tNo projects created.\n\tTo create a new directory, run {templates['add_template']}."
+            f"\n{halftab}No projects created.\n{halftab}To create a new directory, run {templates['add_template']}."
         )
     elif d["ref_proj"] not in project_list and d["ref_proj"] != "ALL":
         raise ValueError(
-            f"\n\t'{d['ref_proj']}' is not a valid project.\n\tAvailable projects are {project_list} or you may enter 'ALL' to see all projects.\n\tTo create a new project directory, run {templates['add_template']}."
+            f"\n{halftab}'{d['ref_proj']}' is not a valid project.\n{halftab}Available projects are {project_list} or you may enter 'ALL' to see all projects.\n{halftab}To create a new project directory, run {templates['add_template']}."
         )
 
     if d["file"][-1] != "s":
@@ -105,7 +104,7 @@ def main():
             idx = define_idx(d["pos"])
             if idx not in list(df.index):
                 raise ValueError(
-                    f"\n\tProvided index not found in project '{d['ref_proj']}' file '{d['file']}'.\n\tTo view file contents, run {templates['list_proj_and_type']}."
+                    f"\n{halftab}Provided index not found in project '{d['ref_proj']}' file '{d['file']}'.\n{halftab}To view file contents, run {templates['list_proj_and_type']}."
                 )
             else:
                 print_description(df.iloc[idx])

@@ -7,7 +7,14 @@ from pathlib import Path
 
 import pandas as pd
 
-from .helpers.helpers import check_init, data_path, define_idx, move, pkg_path
+from .helpers.helpers import (
+    check_init,
+    data_path,
+    define_idx,
+    halftab,
+    move,
+    pkg_path,
+)
 
 check_init()
 
@@ -48,23 +55,23 @@ def main():
 
     if len(project_list) == 0:
         raise ValueError(
-            f"\n\tNo projects yet created.\n\tTo create a new project, run {templates['add_template']}."
+            f"\n{halftab}No projects yet created.\n{halftab}To create a new project, run {templates['add_template']}."
         )
     if not d["ref_proj"]:
-        raise ValueError(f"\n\t'ref_proj' must be provided.")
+        raise ValueError(f"\n{halftab}'ref_proj' must be provided.")
     if d["ref_proj"] not in project_list:
         raise ValueError(
-            f"\n\t'{d['ref_proj']}' is not a valid project.\n\tAvailable projects are {project_list}."
+            f"\n{halftab}'{d['ref_proj']}' is not a valid project.\n{halftab}Available projects are {project_list}."
         )
     if d["entry_type"] is None:
         raise ValueError(
-            f"\n\tNo entry type provided. One of ['task', 'ref', 'note'] must be specified within '{d['ref_proj']}'."
+            f"\n{halftab}No entry type provided. One of ['task', 'ref', 'note'] must be specified within '{d['ref_proj']}'."
         )
     if not set([d["to"], d["from"]]).issubset(
         [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]
     ):
         raise ValueError(
-            f"\n\t'from' and 'to' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100."
+            f"\n{halftab}'from' and 'to' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100."
         )
 
     from_idx = define_idx(d["from"])
@@ -75,7 +82,7 @@ def main():
     df = move(df, from_index=from_idx, to_index=to_idx)
     df.to_csv(path, index=False)
     print(
-        f"\tEntry {entry} successfully moved from position {from_idx} to position {to_idx}."
+        f"{halftab}Entry {entry} successfully moved from position {from_idx} to position {to_idx}."
     )
 
 

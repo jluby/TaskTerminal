@@ -7,7 +7,7 @@ import json
 import os
 from shutil import rmtree
 
-from .helpers.helpers import check_init, data_path, pkg_path
+from .helpers.helpers import check_init, data_path, halftab, pkg_path
 
 check_init()
 
@@ -29,17 +29,21 @@ def main():
     d = vars(parser.parse_args())
 
     if not d["project"]:
-        raise ValueError(f"\n\t'project' must be provided.")
+        raise ValueError(f"\n{halftab}'project' must be provided.")
     if not os.path.exists(f"{data_path}/projects/{d['project']}"):
-        raise ValueError(f"\n\tProject '{d['project']}' does not exist.")
+        raise ValueError(
+            f"\n{halftab}Project '{d['project']}' does not exist."
+        )
 
     base_path = f"{data_path}/projects/{d['project']}"
     confirmed = None
     confirmed = input(
-        f"Are you sure you want to remove {d['project']}? (y/n)\n\tThis action cannot be undone.\n\t"
+        f"Are you sure you want to remove {d['project']}? (y/n)\n{halftab}This action cannot be undone.\n{halftab}"
     )
     while confirmed not in ["y", "Y"] + ["n", "N"]:
-        confirmed = input(f"\n\tAccepted inputs are ['y', 'Y', 'n', 'N'.")
+        confirmed = input(
+            f"\n{halftab}Accepted inputs are ['y', 'Y', 'n', 'N'."
+        )
     if confirmed in ["y", "Y"]:
         rmtree(base_path)
         if d["project"] in project_list:
@@ -52,7 +56,7 @@ def main():
             json.dump(
                 hidden_list, open(f"{data_path}/hidden_project_list.json", "w")
             )
-        print(f"\tProject '{d['project']}' removed successfully.")
+        print(f"{halftab}Project '{d['project']}' removed successfully.")
 
 
 if __name__ == "__main__":

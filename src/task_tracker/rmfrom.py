@@ -8,7 +8,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from .helpers.helpers import check_init, data_path, define_idx, pkg_path
+from .helpers.helpers import (
+    check_init,
+    data_path,
+    define_idx,
+    halftab,
+    pkg_path,
+)
 
 check_init()
 
@@ -42,21 +48,21 @@ def main():
 
     if len(project_list) == 0:
         raise ValueError(
-            f"\n\tNo projects yet created.\n\tTo create a new project, run {templates['add_template']}."
+            f"\n{halftab}No projects yet created.\n{halftab}To create a new project, run {templates['add_template']}."
         )
     if not d["ref_proj"]:
-        raise ValueError(f"\n\t'ref_proj' must be provided.")
+        raise ValueError(f"\n{halftab}'ref_proj' must be provided.")
     if d["ref_proj"] not in project_list:
         raise ValueError(
-            f"\n\t'{d['ref_proj']}' is not a valid project.\n\tAvailable projects are {project_list}."
+            f"\n{halftab}'{d['ref_proj']}' is not a valid project.\n{halftab}Available projects are {project_list}."
         )
     if d["entry_type"] is None:
         raise ValueError(
-            f"\n\tNo entry type provided. One of ['task', 'ref', 'note'] within '{d['ref_proj']}' must be specified."
+            f"\n{halftab}No entry type provided. One of ['task', 'ref', 'note'] within '{d['ref_proj']}' must be specified."
         )
     elif d["pos"] is None:
         raise ValueError(
-            f"\n\tNo positional index provided. Index within {d['entry_type']} must be specified."
+            f"\n{halftab}No positional index provided. Index within {d['entry_type']} must be specified."
         )
 
     base_path = f"{data_path}/projects/{d['ref_proj']}"
@@ -69,18 +75,20 @@ def main():
         )
     to_be_removed = df.iloc[idx]
     confirmed = input(
-        f"\n\tAre you sure you want to remove the below entry? (y/n)\n\tThis action cannot be undone.\n\n{to_be_removed}\n\t"
+        f"\n{halftab}Are you sure you want to remove the below entry? (y/n)\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
     )
     while confirmed not in ["y", "Y"] + ["n", "N"]:
-        confirmed = input(f"\n\tAccepted inputs are ['y', 'Y', 'n', 'N'.")
+        confirmed = input(
+            f"\n{halftab}Accepted inputs are ['y', 'Y', 'n', 'N'."
+        )
     if confirmed in ["y", "Y"]:
         df = df.iloc[[i for i in df.index if i != idx]]
         df.to_csv(path, index=False)
         print(
-            f"\t{d['entry_type'].capitalize()} item {d['pos']} removed successfully."
+            f"{halftab}{d['entry_type'].capitalize()} item {d['pos']} removed successfully."
         )
     else:
-        print(f"\tAction cancelled.")
+        print(f"{halftab}Action cancelled.")
 
 
 if __name__ == "__main__":

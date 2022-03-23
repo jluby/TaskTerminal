@@ -9,7 +9,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from .helpers.helpers import check_init, data_path, define_idx, pkg_path
+from .helpers.helpers import (
+    check_init,
+    data_path,
+    define_idx,
+    halftab,
+    pkg_path,
+)
 
 check_init()
 
@@ -46,19 +52,19 @@ def main():
 
     if not d["ref_proj"] or not d["entry_type"] or not d["pos"]:
         raise ValueError(
-            f"\n\tAll of 'ref_proj', 'entry_type', and 'pos' must be provided."
+            f"\n{halftab}All of 'ref_proj', 'entry_type', and 'pos' must be provided."
         )
     if d["pos"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
         raise ValueError(
-            f"\n\t'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100"
+            f"\n{halftab}'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100"
         )
     if len(project_list) == 0:
         raise ValueError(
-            f"\n\tNo projects yet created.\n\tTo create a new project, run {templates['add_template']}"
+            f"\n{halftab}No projects yet created.\n{halftab}To create a new project, run {templates['add_template']}"
         )
     if d["ref_proj"] not in project_list:
         raise ValueError(
-            f"\n\t'{d['ref_proj']}' is not a valid project.\n\tAvailable projects are {project_list}."
+            f"\n{halftab}'{d['ref_proj']}' is not a valid project.\n{halftab}Available projects are {project_list}."
         )
 
     path = f"{data_path}/projects/{d['ref_proj']}/{d['entry_type']}s.csv"
@@ -70,10 +76,12 @@ def main():
         )
     to_be_archived = df.iloc[idx]
     confirmed = input(
-        f"\n\tAre you sure you want to archive the below entry? (y/n)\n\tThis action cannot be undone.\n\n{to_be_archived}\n\t"
+        f"\n{halftab}Are you sure you want to archive the below entry? (y/n)\n{halftab}This action cannot be undone.\n\n{to_be_archived}\n{halftab}"
     )
     while confirmed not in ["y", "Y"] + ["n", "N"]:
-        confirmed = input(f"\n\tAccepted inputs are ['y', 'Y', 'n', 'N'.")
+        confirmed = input(
+            f"\n{halftab}Accepted inputs are ['y', 'Y', 'n', 'N'."
+        )
     if confirmed in ["y", "Y"]:
         archive_path = f"{data_path}/projects/{d['ref_proj']}/archives/{d['entry_type']}s.csv"
         archive_df = pd.read_csv(archive_path)
@@ -85,10 +93,10 @@ def main():
         df = df.iloc[[i for i in df.index if i != idx]]
         df.to_csv(path, index=False)
         print(
-            f"\t{d['entry_type'].capitalize()} item {d['pos']} archived successfully."
+            f"{halftab}{d['entry_type'].capitalize()} item {d['pos']} archived successfully."
         )
     else:
-        print(f"\tAction cancelled.")
+        print(f"{halftab}Action cancelled.")
 
 
 if __name__ == "__main__":

@@ -8,7 +8,8 @@ import os
 
 import pandas as pd
 
-from .helpers.helpers import check_init, data_path
+from .helpers.helpers import check_init, data_path, halftab
+
 
 def main():
     check_init()
@@ -28,9 +29,11 @@ def main():
     d = vars(parser.parse_args())
 
     if not d["project"]:
-        raise ValueError(f"\n\t'project' must be provided.")
+        raise ValueError(f"\n{halftab}'project' must be provided.")
     if os.path.exists(f"{data_path}/projects/{d['project']}"):
-        raise ValueError(f"\n\tProject '{d['project']}' already exists.")
+        raise ValueError(
+            f"\n{halftab}Project '{d['project']}' already exists."
+        )
 
     base_path = f"{data_path}/projects/{d['project']}"
     os.makedirs(base_path)
@@ -48,7 +51,7 @@ def main():
     project_list.append(d["project"])
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
 
-    print(f"\tProject '{d['project']}' created successfully.")
+    print(f"{halftab}Project '{d['project']}' created successfully.")
 
 
 if __name__ == "__main__":

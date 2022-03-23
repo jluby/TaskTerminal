@@ -5,7 +5,13 @@ import argparse
 import json
 from pathlib import Path
 
-from .helpers.helpers import check_init, data_path, define_idx, pkg_path
+from .helpers.helpers import (
+    check_init,
+    data_path,
+    define_idx,
+    halftab,
+    pkg_path,
+)
 
 check_init()
 
@@ -40,7 +46,7 @@ def main():
     project_list.insert(to_idx, proj_to_move)
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
     print(
-        f"\tProject {proj_to_move} successfully moved from position {from_idx} to position {to_idx}."
+        f"{halftab}Project {proj_to_move} successfully moved from position {from_idx} to position {to_idx}."
     )
 
 

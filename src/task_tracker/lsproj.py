@@ -5,7 +5,7 @@
 import json
 from pathlib import Path
 
-from .helpers.helpers import check_init, data_path
+from .helpers.helpers import check_init, data_path, halftab
 
 check_init()
 
@@ -15,8 +15,8 @@ def main():
     project_list = json.load(open(f"{data_path}/project_list.json", "r"))
     hidden_list = json.load(open(f"{data_path}/hidden_project_list.json", "r"))
 
-    print(f"\n\tActive projects: {project_list}")
-    print(f"\n\tHidden projects: {hidden_list}\n")
+    print(f"\n{halftab}Active projects: {project_list}")
+    print(f"\n{halftab}Hidden projects: {hidden_list}\n")
 
 
 if __name__ == "__main__":

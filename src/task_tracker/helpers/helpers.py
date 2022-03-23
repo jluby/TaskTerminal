@@ -2,14 +2,14 @@
 import json
 import os
 from pathlib import Path
-from termcolor import colored
 
 import pandas as pd
+from termcolor import colored
 
 pkg_path = Path(__file__).parents[1]
 data_path = f"{pkg_path}/.package_data"
 
-short_break = " "*4
+halftab = " " * 4
 
 
 def check_init():
@@ -19,17 +19,19 @@ def check_init():
         json.dump([], open(f"{data_path}/hidden_project_list.json", "w"))
         os.makedirs(f"{data_path}/projects")
 
+
 def split_to_width(string: str, linelen: int):
     string = string.strip()
     if len(string) <= linelen:
         string_ls = [string]
     else:
         string_ls = []
-        remainder = string; check_idx = linelen
+        remainder = string
+        check_idx = linelen
         while len(remainder) > linelen:
             if remainder[check_idx] == " ":
                 string_ls.append(remainder[:check_idx])
-                remainder = remainder[check_idx+1:]
+                remainder = remainder[check_idx + 1 :]
                 check_idx = linelen
             elif check_idx == 0:
                 string_ls.append(remainder[:linelen])
@@ -38,10 +40,13 @@ def split_to_width(string: str, linelen: int):
             else:
                 check_idx -= 1
         string_ls.append(remainder)
-    
-    return [f'{l: <{linelen}}' for l in string_ls]
 
-def print_special(string: str, n_tab: int = 0, time_estimate: float = None) -> None:
+    return [f"{l: <{linelen}}" for l in string_ls]
+
+
+def print_special(
+    string: str, n_tab: int = 0, time_estimate: float = None
+) -> None:
     entry_char_limit = 20
     lines = []
     for l in string.split(sep="|"):
@@ -49,9 +54,9 @@ def print_special(string: str, n_tab: int = 0, time_estimate: float = None) -> N
         lines += newlines
     # TODO: split lines that are too long and pad to unit width
     # TODO: print time estimate next if task
-    plural = 's' if time_estimate != 1 else ''
-    print(short_break + lines[0] + short_break + f"{time_estimate}hr{plural}")
-    [print(short_break + "\t" * n_tab + l) for l in lines[1:]]
+    plural = "s" if time_estimate != 1 else ""
+    print(halftab + lines[0] + halftab + f"{time_estimate}hr{plural}")
+    [print(halftab + "\t" * n_tab + l) for l in lines[1:]]
 
 
 def print_entries(df: pd.DataFrame, file: str) -> None:
@@ -59,9 +64,15 @@ def print_entries(df: pd.DataFrame, file: str) -> None:
     print("-" * 40)
     if len(df) > 0:
         for i, row in enumerate(df.to_dict("records")):
-            entry = colored(row["entry"],"red",attrs=["bold"]) if row["flagged"] else row["entry"]
+            entry = (
+                colored(row["entry"], "red", attrs=["bold"])
+                if row["flagged"]
+                else row["entry"]
+            )
             time_estimate = row["time_estimate"] if file == "tasks" else None
-            print_special(f"{i}\t{entry}", n_tab=1, time_estimate=time_estimate)
+            print_special(
+                f"{i}\t{entry}", n_tab=1, time_estimate=time_estimate
+            )
     print("-" * 40)
 
 
