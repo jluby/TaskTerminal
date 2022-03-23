@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Move item in list to another position."""
 
-import json
 import argparse
-import pandas as pd
+import json
 from pathlib import Path
 
-from .helpers.helpers import define_idx, move, pkg_path, data_path, check_init
+import pandas as pd
+
+from .helpers.helpers import check_init, data_path, define_idx, move, pkg_path
 
 check_init()
 
@@ -14,11 +15,10 @@ check_init()
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 
+
 def main():
     # establish parser to pull in projects to view
-    parser = argparse.ArgumentParser(
-        description="Get entry to move."
-    )
+    parser = argparse.ArgumentParser(description="Get entry to move.")
     parser.add_argument(
         "ref_proj",
         type=str,
@@ -60,16 +60,24 @@ def main():
         raise ValueError(
             f"\n\tNo entry type provided. One of ['task', 'ref', 'note'] must be specified within '{d['ref_proj']}'."
         )
-    if not set([d["to"], d["from"]]).issubset([None, "HEAD", "TAIL"] + [str(i) for i in range(100)]):
-        raise ValueError(f"\n\t'from' and 'to' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.")
+    if not set([d["to"], d["from"]]).issubset(
+        [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]
+    ):
+        raise ValueError(
+            f"\n\t'from' and 'to' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100."
+        )
 
-    from_idx = define_idx(d["from"]); to_idx = define_idx(d["to"])
+    from_idx = define_idx(d["from"])
+    to_idx = define_idx(d["to"])
     path = f"{data_path}/projects/{d['ref_proj']}/{d['entry_type']}s.csv"
     df = pd.read_csv(path)
     entry = df.loc[from_idx, "entry"]
     df = move(df, from_index=from_idx, to_index=to_idx)
     df.to_csv(path)
-    print(f"\tEntry {entry} successfully moved from position {from_idx} to position {to_idx}.")
+    print(
+        f"\tEntry {entry} successfully moved from position {from_idx} to position {to_idx}."
+    )
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()

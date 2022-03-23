@@ -5,14 +5,15 @@
 import argparse
 import json
 import os
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
 
-from .helpers.helpers import move, define_idx, pkg_path, data_path, check_init
+from .helpers.helpers import check_init, data_path, define_idx, move, pkg_path
 
 check_init()
+
 
 def main():
     # establish parameters
@@ -20,9 +21,7 @@ def main():
     project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 
     # establish parser to pull in projects to view
-    parser = argparse.ArgumentParser(
-        description="Get entries to add."
-    )
+    parser = argparse.ArgumentParser(description="Get entries to add.")
     parser.add_argument(
         "ref_proj",
         type=str,
@@ -53,7 +52,9 @@ def main():
     d = vars(parser.parse_args())
 
     if d["pos"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
-        raise ValueError(f"\n\t'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.")
+        raise ValueError(
+            f"\n\t'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100."
+        )
     if len(project_list) == 0:
         raise ValueError(
             f"\n\tNo projects yet created.\n\tTo create a new project, run {templates['add_template']}."
@@ -78,5 +79,6 @@ def main():
     df.to_csv(path, index=False)
     print(f"\t{d['entry_type'].capitalize()} added successfully.")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()

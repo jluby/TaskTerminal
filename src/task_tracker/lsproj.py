@@ -5,9 +5,10 @@
 import json
 from pathlib import Path
 
-from .helpers.helpers import data_path, check_init
+from .helpers.helpers import check_init, data_path
 
 check_init()
+
 
 def main():
     # establish parameters
@@ -16,6 +17,7 @@ def main():
 
     print(f"\n\tActive projects: {project_list}")
     print(f"\n\tHidden projects: {hidden_list}\n")
+
 
 if __name__ == "__main__":
     main()
