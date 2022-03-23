@@ -6,7 +6,7 @@ import argparse
 import json
 import os
 from datetime import datetime
-from pathlib import Path
+from contextlib import suppress
 
 import pandas as pd
 
@@ -39,7 +39,7 @@ def main():
     parser.add_argument(
         "pos",
         nargs="?",
-        default="HEAD",
+        default="TAIL",
         help="Position at which to add entry. Accepted arguments are zero / positive integer indices, 'HEAD', and 'TAIL'.",
     )
     parser.add_argument(
@@ -73,7 +73,14 @@ def main():
         entry = input(f"\tProvide {d['entry_type']}:\n\t\t")
     description = input(f"\tDescribe {d['entry_type']}:\n\t\t")
     entry_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    df.loc[len(df)] = [entry, description, d["flag"], entry_time]
+    if d["entry_type"] == "task":
+        time_estimate = ""
+        while type(time_estimate) is not float:
+            with suppress(ValueError):
+                time_estimate = float(input(f"\tHow long will this take?\n\t\t"))
+        df.loc[len(df)] = [entry, description, time_estimate, d["flag"], entry_time]
+    else:
+        df.loc[len(df)] = [entry, description, d["flag"], entry_time]
     df = move(df, from_index=-1, to_index=define_idx(d["pos"]))
     df.to_csv(path, index=False)
     print(f"\t{d['entry_type'].capitalize()} added successfully.")

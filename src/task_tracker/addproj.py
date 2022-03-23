@@ -5,21 +5,18 @@
 import argparse
 import json
 import os
-from pathlib import Path
 
 import pandas as pd
 
-from .helpers.helpers import check_init, data_path, pkg_path
-
-check_init()
-
-# establish parameters
-templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
-project_list = json.load(open(f"{data_path}/project_list.json", "r"))
-cols = ["entry", "description", "flagged", "datetime_created"]
-
+from .helpers.helpers import check_init, data_path
 
 def main():
+    check_init()
+
+    # establish parameters
+    project_list = json.load(open(f"{data_path}/project_list.json", "r"))
+    cols = ["entry", "description", "flagged", "datetime_created"]
+
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(description="Get project to add.")
     parser.add_argument(
@@ -39,6 +36,8 @@ def main():
     os.makedirs(base_path)
     os.makedirs(f"{base_path}/archives")
     for file in ["tasks", "refs", "notes"]:
+        if file == "tasks":
+            cols.insert(2, "time_estimate")
         pd.DataFrame(columns=cols).to_csv(
             f"{base_path}/{file}.csv", index=False
         )

@@ -93,14 +93,14 @@ def main():
         for proj in project_list:
             df = pd.read_csv(f"{data_path}/projects/{proj}/{d['file']}.csv")
             print("\n" + proj)
-            print_entries(df)
+            print_entries(df, file=d["file"])
         print("")
     else:
         df = pd.read_csv(
             f"{data_path}/projects/{d['ref_proj']}/{d['file']}.csv"
         )
         if d["pos"] is None:
-            print_entries(df)
+            print_entries(df, file=d["file"])
         else:
             idx = define_idx(d["pos"])
             if idx not in list(df.index):
