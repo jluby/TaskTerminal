@@ -14,9 +14,9 @@ from .helpers.helpers import (
     halftab,
     move,
     pkg_path,
+    timed_sleep
 )
-
-check_init()
+from task_tracker import lst
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
@@ -24,6 +24,8 @@ project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 
 
 def main():
+    check_init()
+
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(description="Get entry to move.")
     parser.add_argument(
@@ -82,8 +84,11 @@ def main():
     df = move(df, from_index=from_idx, to_index=to_idx)
     df.to_csv(path, index=False)
     print(
-        f"{halftab}Entry {entry} successfully moved from position {from_idx} to position {to_idx}."
+        f"{halftab}Entry {from_idx} successfully moved to position {to_idx}."
     )
+
+    timed_sleep()
+    lst.main(parse_args=False)
 
 
 if __name__ == "__main__":

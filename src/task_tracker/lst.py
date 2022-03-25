@@ -13,11 +13,10 @@ from .helpers.helpers import (
     define_idx,
     halftab,
     pkg_path,
-    print_description,
-    print_entries,
+    parse_description,
+    parse_entries,
+    print_lines
 )
-
-check_init()
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
@@ -27,7 +26,9 @@ project_list = [p for p in project_list if p not in hidden_list]
 lists = ["notes", "note", "tasks", "task", "refs", "ref"]
 
 
-def main():
+def main(parse_args=True):
+    check_init()
+
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(description="Input project to view.")
     parser.add_argument(
@@ -64,7 +65,10 @@ def main():
         default=False,
         help="If provided, show archives.",
     )
-    d = vars(parser.parse_args())
+    if parse_args:
+        d = vars(parser.parse_args())
+    else:
+        d = vars(parser.parse_args([]))
 
     if d["pos"] and d["ref_proj"] == "ALL":
         raise ValueError(
@@ -82,24 +86,26 @@ def main():
         raise ValueError(
             f"\n{halftab}'{d['ref_proj']}' is not a valid project.\n{halftab}Available projects are {project_list} or you may enter 'ALL' to see all projects.\n{halftab}To create a new project directory, run {templates['add_template']}."
         )
-
+        
     if d["file"][-1] != "s":
         d["file"] += "s"
     if d["arc"] == True:
         d["file"] = f"archives/{d['file']}"
 
     if d["ref_proj"] == "ALL":
+        lines = []
         for proj in project_list:
             df = pd.read_csv(f"{data_path}/projects/{proj}/{d['file']}.csv")
-            print("\n" + proj)
-            print_entries(df, file=d["file"])
-        print("")
+            lines += ['', proj]
+            proj_lines = parse_entries(df, file=d["file"])
+            lines += proj_lines
+        lines.append("")
     else:
         df = pd.read_csv(
             f"{data_path}/projects/{d['ref_proj']}/{d['file']}.csv"
         )
         if d["pos"] is None:
-            print_entries(df, file=d["file"])
+            lines = parse_entries(df, file=d["file"])
         else:
             idx = define_idx(d["pos"])
             if idx not in list(df.index):
@@ -107,7 +113,9 @@ def main():
                     f"\n{halftab}Provided index not found in project '{d['ref_proj']}' file '{d['file']}'.\n{halftab}To view file contents, run {templates['list_proj_and_type']}."
                 )
             else:
-                print_description(df.iloc[idx])
+                lines = parse_description(df.iloc[idx])
+    
+    print_lines(lines)
 
 
 if __name__ == "__main__":

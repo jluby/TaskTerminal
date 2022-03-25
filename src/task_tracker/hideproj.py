@@ -6,9 +6,8 @@ import argparse
 import json
 from pathlib import Path
 
-from .helpers.helpers import check_init, data_path, halftab, pkg_path
-
-check_init()
+from .helpers.helpers import check_init, data_path, halftab, pkg_path, timed_sleep
+import lst
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
@@ -17,6 +16,8 @@ hidden_list = json.load(open(f"{data_path}/hidden_project_list.json", "r"))
 
 
 def main():
+    check_init()
+
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(description="Get project to hide.")
     parser.add_argument(
@@ -56,6 +57,9 @@ def main():
     print(
         f"{halftab}Project {d['project']} successfully {type_str} hidden list."
     )
+
+    timed_sleep()
+    lst.main(parse_args=False)
 
 
 if __name__ == "__main__":

@@ -27,4 +27,3 @@ setuptools.setup(
     'console_scripts': [f'{file[:-3]} = task_tracker.{file[:-3]}:main' for file in os.listdir("src/task_tracker") if file[-3:] == ".py"]
     }
 )
-        

@@ -4,9 +4,11 @@
 # base imports
 import argparse
 import json
-from pathlib import Path
+import os
+import time
 
 import pandas as pd
+import numpy as np
 
 from .helpers.helpers import (
     check_init,
@@ -14,9 +16,9 @@ from .helpers.helpers import (
     define_idx,
     halftab,
     pkg_path,
+    timed_sleep
 )
-
-check_init()
+from task_tracker import lst
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
@@ -24,6 +26,8 @@ project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 
 
 def main():
+    check_init()
+
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(description="Get entries to remove.")
     parser.add_argument(
@@ -74,6 +78,9 @@ def main():
             f"Provided index not found in project '{d['ref_proj']}' file {d['entry_type']}s."
         )
     to_be_removed = df.iloc[idx]
+    os.system("printf '\e[3;0;0t'")
+    print_width = np.max([60,np.min([np.max([len(l) for l in to_be_removed.tolist() if type(l) is str])+21, 70])])
+    os.system(f"printf '\e[8;{len(to_be_removed)+6};{print_width}t'")
     confirmed = input(
         f"\n{halftab}Are you sure you want to remove the below entry? (y/n)\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
     )
@@ -89,6 +96,9 @@ def main():
         )
     else:
         print(f"{halftab}Action cancelled.")
+
+    timed_sleep()
+    lst.main(parse_args=False)
 
 
 if __name__ == "__main__":

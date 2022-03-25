@@ -2,8 +2,10 @@
 import json
 import os
 from pathlib import Path
+import time
 
 import pandas as pd
+import numpy as np
 from termcolor import colored
 
 pkg_path = Path(__file__).parents[1]
@@ -11,8 +13,17 @@ data_path = f"{pkg_path}/.package_data"
 
 halftab = " " * 4
 
+def timed_sleep():
+    time.sleep(1.5)
 
-def check_init():
+def print_lines(lines: list) -> None:
+    width = np.max([len(line) for line in lines]) + 2
+    height = len(lines) + 1
+    os.system("printf '\e[3;0;0t'")
+    os.system(f"printf '\e[8;{height};{width}t'")
+    [print(line) for line in lines]
+
+def check_init() -> None:
     if not os.path.isdir(data_path):
         os.makedirs(data_path)
         json.dump([], open(f"{data_path}/project_list.json", "w"))
@@ -20,7 +31,7 @@ def check_init():
         os.makedirs(f"{data_path}/projects")
 
 
-def split_to_width(string: str, linelen: int):
+def split_to_width(string: str, linelen: int) -> list:
     string = string.strip()
     if len(string) <= linelen:
         string_ls = [string]
@@ -44,24 +55,25 @@ def split_to_width(string: str, linelen: int):
     return [f"{l: <{linelen}}" for l in string_ls]
 
 
-def print_special(
+def parse_row(
     string: str, n_tab: int = 0, time_estimate: float = None
 ) -> None:
-    entry_char_limit = 20
+    entry_char_limit = 30
     lines = []
     for l in string.split(sep="|"):
         newlines = split_to_width(l, linelen=entry_char_limit)
         lines += newlines
-    # TODO: split lines that are too long and pad to unit width
-    # TODO: print time estimate next if task
-    plural = "s" if time_estimate != 1 else ""
-    print(halftab + lines[0] + halftab + f"{time_estimate}hr{plural}")
-    [print(halftab + "\t" * n_tab + l) for l in lines[1:]]
+    timestamp = f"{time_estimate}hrs" if time_estimate else ""
+    line0 = halftab + lines[0] + halftab + timestamp
+    extra_lines = [halftab + "\t" * n_tab + l for l in lines[1:]]
+    return [line0] + extra_lines
 
 
-def print_entries(df: pd.DataFrame, file: str) -> None:
+def parse_entries(df: pd.DataFrame, file: str) -> None:
     """Print all entries in dataframe"""
-    print("-" * 40)
+    lines = []
+    width = 50
+    lines.append("-" * width)
     if len(df) > 0:
         for i, row in enumerate(df.to_dict("records")):
             entry = (
@@ -70,14 +82,13 @@ def print_entries(df: pd.DataFrame, file: str) -> None:
                 else row["entry"]
             )
             time_estimate = row["time_estimate"] if file == "tasks" else None
-            print_special(
-                f"{i}\t{entry}", n_tab=1, time_estimate=time_estimate
-            )
-    print("-" * 40)
+            rowlines = parse_row(f"{i}\t{entry}", n_tab=1, time_estimate=time_estimate)
+            lines += rowlines
+    lines.append("-" * width)
+    return lines
 
-
-def print_description(df_row: pd.DataFrame) -> None:
-    print_special(f"{df_row['description']}")
+def parse_description(df_row: pd.DataFrame) -> list:
+    return [''] + parse_row(f"{df_row['description']}") + ['']
 
 
 def define_idx(pos) -> int:

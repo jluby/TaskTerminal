@@ -8,8 +8,8 @@ import os
 
 import pandas as pd
 
-from .helpers.helpers import check_init, data_path, halftab
-
+from .helpers.helpers import check_init, data_path, halftab, timed_sleep
+import lst
 
 def main():
     check_init()
@@ -52,6 +52,9 @@ def main():
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
 
     print(f"{halftab}Project '{d['project']}' created successfully.")
+    
+    timed_sleep()
+    lst.main(parse_args=False)
 
 
 if __name__ == "__main__":

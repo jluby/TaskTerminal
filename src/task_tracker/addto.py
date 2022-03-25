@@ -16,12 +16,13 @@ from .helpers.helpers import (
     halftab,
     move,
     pkg_path,
+    timed_sleep
 )
-
-check_init()
-
+import lst
 
 def main():
+    check_init()
+
     # establish parameters
     templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
     project_list = json.load(open(f"{data_path}/project_list.json", "r"))
@@ -98,6 +99,9 @@ def main():
     df = move(df, from_index=-1, to_index=define_idx(d["pos"]))
     df.to_csv(path, index=False)
     print(f"{halftab}{d['entry_type'].capitalize()} added successfully.")
+
+    timed_sleep()
+    lst.main(parse_args=False)
 
 
 if __name__ == "__main__":

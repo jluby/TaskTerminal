@@ -3,24 +3,22 @@
 
 import argparse
 import json
-from pathlib import Path
 
 from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
     halftab,
-    pkg_path,
+    timed_sleep
 )
-
-check_init()
+import lst
 
 # establish parameters
-templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 
-
 def main():
+    check_init()
+
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(
         description="Get project or entry to move."
@@ -48,6 +46,9 @@ def main():
     print(
         f"{halftab}Project {proj_to_move} successfully moved from position {from_idx} to position {to_idx}."
     )
+
+    timed_sleep()
+    lst.main(parse_args=False)
 
 
 if __name__ == "__main__":
