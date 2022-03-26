@@ -11,7 +11,7 @@ from .helpers.helpers import (
     halftab,
     timed_sleep
 )
-import lst
+from task_tracker import lst
 
 # establish parameters
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))

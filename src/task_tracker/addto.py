@@ -18,7 +18,7 @@ from .helpers.helpers import (
     pkg_path,
     timed_sleep
 )
-import lst
+from task_tracker import lst
 
 def main():
     check_init()

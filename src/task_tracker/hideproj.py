@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 from .helpers.helpers import check_init, data_path, halftab, pkg_path, timed_sleep
-import lst
+from task_tracker import lst
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
