@@ -39,12 +39,11 @@ def main():
     os.makedirs(base_path)
     os.makedirs(f"{base_path}/archives")
     for file in ["tasks", "refs", "notes"]:
-        if file == "tasks":
-            cols.insert(2, "time_estimate")
-        pd.DataFrame(columns=cols).to_csv(
+        save_cols = cols[:2] + ["time_estimate"] + cols[2:] if file == "tasks" else cols
+        pd.DataFrame(columns=save_cols).to_csv(
             f"{base_path}/{file}.csv", index=False
         )
-        pd.DataFrame(columns=cols + ["datetime_archived"]).to_csv(
+        pd.DataFrame(columns=save_cols + ["datetime_archived"]).to_csv(
             f"{base_path}/archives/{file}.csv", index=False
         )
 

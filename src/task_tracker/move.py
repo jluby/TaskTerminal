@@ -16,7 +16,7 @@ from .helpers.helpers import (
     pkg_path,
     timed_sleep
 )
-from task_tracker from task_tracker import lst
+from task_tracker import lst
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
