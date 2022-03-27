@@ -3,7 +3,6 @@
 
 # base imports
 import json
-from pathlib import Path
 
 from .helpers.helpers import check_init, data_path, halftab
 

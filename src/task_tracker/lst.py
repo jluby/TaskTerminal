@@ -11,11 +11,11 @@ from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
-    halftab,
     pkg_path,
     parse_description,
     parse_entries,
-    print_lines
+    print_lines,
+    reformat
 )
 
 # establish parameters
@@ -72,19 +72,19 @@ def main(parse_args=True):
 
     if d["pos"] and d["ref_proj"] == "ALL":
         raise ValueError(
-            f"\n{halftab}Use of 'pos' kwarg requires specification of a single project."
+            reformat(f"Use of 'pos' kwarg requires specification of a single project.", input_type="error")
         )
     if d["pos"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
         raise ValueError(
-            f"\n{halftab}'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100."
+            reformat(f"'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.", input_type="error")
         )
     if len(project_list) == 0:
         raise ValueError(
-            f"\n{halftab}No projects created.\n{halftab}To create a new directory, run {templates['add_template']}."
+            reformat(f"No projects created. To create a new directory, run {templates['add_template']}.", input_type="error")
         )
     elif d["ref_proj"] not in project_list and d["ref_proj"] != "ALL":
         raise ValueError(
-            f"\n{halftab}'{d['ref_proj']}' is not a valid project.\n{halftab}Available projects are {project_list} or you may enter 'ALL' to see all projects.\n{halftab}To create a new project directory, run {templates['add_template']}."
+            reformat(f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list} or you may enter 'ALL' to see all projects. To create a new project directory, run {templates['add_template']}.", input_type="error")
         )
         
     if d["file"][-1] != "s":
@@ -110,7 +110,7 @@ def main(parse_args=True):
             idx = define_idx(d["pos"])
             if idx not in list(df.index):
                 raise ValueError(
-                    f"\n{halftab}Provided index not found in project '{d['ref_proj']}' file '{d['file']}'.\n{halftab}To view file contents, run {templates['list_proj_and_type']}."
+                    reformat(f"Provided index not found in project '{d['ref_proj']}' file '{d['file']}'. To view file contents, run {templates['list_proj_and_type']}.", input_type="error")
                 )
             else:
                 lines = parse_description(df.iloc[idx])

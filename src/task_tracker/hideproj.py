@@ -6,7 +6,7 @@ import argparse
 import json
 from pathlib import Path
 
-from .helpers.helpers import check_init, data_path, halftab, pkg_path, timed_sleep
+from .helpers.helpers import check_init, data_path, pkg_path, timed_sleep, reformat
 from task_tracker import lst
 
 # establish parameters
@@ -34,15 +34,15 @@ def main():
     )
     d = vars(parser.parse_args())
 
-    helper_str = f"\n{halftab}To hide a project, run {templates['hide_project']}\n{halftab}To unhide a project, run {templates['unhide_project']}."
+    helper_str = reformat(f"To hide a project, run {templates['hide_project']}. To unhide a project, run {templates['unhide_project']}.", input_type="error")
     if not d["project"]:
         raise ValueError(
-            f"\n{halftab}Project name must be provided.{helper_str}"
+            reformat("Project name must be provided.", input_type="error") + helper_str
         )
     ref_ls = project_list if not d["u"] else hidden_list
     if d["project"] not in ref_ls:
         raise ValueError(
-            f"\n{halftab}Project not found in reference list.{helper_str}"
+            reformat("Project not found in reference list.", input_type="error") + helper_str
         )
 
     if not d["u"]:
@@ -55,7 +55,7 @@ def main():
     json.dump(hidden_list, open(f"{data_path}/hidden_project_list.json", "w"))
     type_str = "added to" if not d["u"] else "removed from"
     print(
-        f"{halftab}Project {d['project']} successfully {type_str} hidden list."
+        reformat(f"Project {d['project']} successfully {type_str} hidden list.")
     )
 
     timed_sleep()

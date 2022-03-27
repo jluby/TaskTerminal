@@ -13,6 +13,24 @@ data_path = f"{pkg_path}/.package_data"
 
 halftab = " " * 4
 
+def set_entry_size(entry):
+    print_width = np.max([60,np.min([np.max([len(l) for l in entry.tolist() if type(l) is str])+21, 70])])
+    os.system("printf '\e[3;0;0t'")
+    os.system(f"printf '\e[8;{len(entry)+6};{print_width}t'")
+
+def reformat(string: str, input_type: str = None):
+    string = string.replace(". ", ".@")
+    sentences = [s for s in string.split(sep="@")]
+    newstring = ""
+    for s in sentences:
+        s = f"{halftab}{s}"
+        if input_type == "input":
+            s = f"{s}\n\t"
+        if input_type == "error":
+            s = f"\n{s}"
+        newstring += s
+    return newstring
+
 def timed_sleep():
     time.sleep(1.5)
 

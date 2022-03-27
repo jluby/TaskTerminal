@@ -16,7 +16,9 @@ from .helpers.helpers import (
     define_idx,
     halftab,
     pkg_path,
-    timed_sleep
+    timed_sleep,
+    reformat,
+    set_entry_size
 )
 from task_tracker import lst
 
@@ -55,19 +57,19 @@ def main():
 
     if not d["ref_proj"] or not d["entry_type"] or not d["pos"]:
         raise ValueError(
-            f"\n{halftab}All of 'ref_proj', 'entry_type', and 'pos' must be provided."
+            reformat(f"All of 'ref_proj', 'entry_type', and 'pos' must be provided.", input_type="error")
         )
     if d["pos"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
         raise ValueError(
-            f"\n{halftab}'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100"
+            reformat(f"'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100", input_type="error")
         )
     if len(project_list) == 0:
         raise ValueError(
-            f"\n{halftab}No projects yet created.\n{halftab}To create a new project, run {templates['add_template']}"
+            reformat(f"No projects yet created. To create a new project, run {templates['add_template']}", input_type="error")
         )
     if d["ref_proj"] not in project_list:
         raise ValueError(
-            f"\n{halftab}'{d['ref_proj']}' is not a valid project.\n{halftab}Available projects are {project_list}."
+            reformat(f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list}.", input_type="error")
         )
 
     path = f"{data_path}/projects/{d['ref_proj']}/{d['entry_type']}s.csv"
@@ -75,18 +77,16 @@ def main():
     idx = define_idx(d["pos"])
     if idx not in list(df.index):
         raise ValueError(
-            f"Provided index not found in project '{d['ref_proj']}' file {d['entry_type']}s"
+            reformat(f"Provided index not found in project '{d['ref_proj']}' file {d['entry_type']}s", input_type="error")
         )
     to_be_archived = df.iloc[idx]
-    os.system("printf '\e[3;0;0t'")
-    print_width = np.max([60,np.min([np.max([len(l) for l in to_be_archived.tolist() if type(l) is str])+21, 70])])
-    os.system(f"printf '\e[8;{len(to_be_archived)+6};{print_width}t'")
+    set_entry_size(to_be_archived)
     confirmed = input(
         f"\n{halftab}Are you sure you want to archive the below entry? (y/n)\n{halftab}This action cannot be undone.\n\n{to_be_archived}\n{halftab}"
     )
     while confirmed not in ["y", "Y"] + ["n", "N"]:
         confirmed = input(
-            f"\n{halftab}Accepted inputs are ['y', 'Y', 'n', 'N'."
+            reformat(f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input")
         )
     if confirmed in ["y", "Y"]:
         archive_path = f"{data_path}/projects/{d['ref_proj']}/archives/{d['entry_type']}s.csv"
@@ -99,10 +99,10 @@ def main():
         df = df.iloc[[i for i in df.index if i != idx]]
         df.to_csv(path, index=False)
         print(
-            f"{halftab}{d['entry_type'].capitalize()} item {d['pos']} archived successfully."
+            reformat(f"{d['entry_type'].capitalize()} item {d['pos']} archived successfully.")
         )
     else:
-        print(f"{halftab}Action cancelled.")
+        print(reformat("Action cancelled."))
 
     timed_sleep()
     lst.main(parse_args=False)

@@ -16,7 +16,8 @@ from .helpers.helpers import (
     halftab,
     move,
     pkg_path,
-    timed_sleep
+    timed_sleep,
+    reformat
 )
 from task_tracker import lst
 
@@ -59,33 +60,38 @@ def main():
 
     if d["pos"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
         raise ValueError(
-            f"\n{halftab}'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100."
+            reformat(f"'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.", input_type="error")
         )
     if len(project_list) == 0:
         raise ValueError(
-            f"\n{halftab}No projects yet created.\n{halftab}To create a new project, run {templates['add_template']}."
+            reformat(f"No projects yet created. To create a new project, run {templates['add_template']}.", input_type="error")
         )
     if not d["ref_proj"]:
-        raise ValueError(f"\n{halftab}'ref_proj' must be provided.")
+        raise ValueError(reformat(f"'ref_proj' must be provided.", input_type="error"))
     if d["ref_proj"] not in project_list:
         raise ValueError(
-            f"\n{halftab}'{d['ref_proj']}' is not a valid project.\n{halftab}Available projects are {project_list}."
+            reformat(f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list}.", input_type="error")
         )
+
+    if d["entry_type"][-1] == "s":
+        d["entry_type"] = d["entry_type"][:-1]
 
     path = f"{data_path}/projects/{d['ref_proj']}/{d['entry_type']}s.csv"
     df = pd.read_csv(path)
     entry = ""
     description = ""
+    entry_str = f"Provide {d['entry_type']}:" if d['entry_type'] != "ref" else f"Provide {d['entry_type']} description:"
     while entry == "":
-        entry = input(f"{halftab}Provide {d['entry_type']}:\n\t")
-    description = input(f"{halftab}Describe {d['entry_type']}:\n\t")
+        entry = input(reformat(entry_str, input_type="input"))
+    description_str = f"Describe {d['entry_type']}:" if d['entry_type'] != "ref" else f"Paste reference below:"
+    description = input(reformat(description_str, input_type="input"))
     entry_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     if d["entry_type"] == "task":
         time_estimate = ""
         while type(time_estimate) is not float:
             with suppress(ValueError):
                 time_estimate = float(
-                    input(f"{halftab}How long will this take (in hours)?\n\t")
+                    input(reformat("How long will this take (in hours)?", input_type="input"))
                 )
         df.loc[len(df)] = [
             entry,
@@ -98,7 +104,7 @@ def main():
         df.loc[len(df)] = [entry, description, d["flag"], entry_time]
     df = move(df, from_index=-1, to_index=define_idx(d["pos"]))
     df.to_csv(path, index=False)
-    print(f"{halftab}{d['entry_type'].capitalize()} added successfully.")
+    print(reformat(f"{d['entry_type'].capitalize()} added successfully.", input_type=None))
 
     timed_sleep()
     lst.main(parse_args=False)

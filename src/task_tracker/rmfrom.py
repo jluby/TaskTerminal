@@ -16,7 +16,9 @@ from .helpers.helpers import (
     define_idx,
     halftab,
     pkg_path,
-    timed_sleep
+    timed_sleep,
+    reformat,
+    set_entry_size
 )
 from task_tracker import lst
 
@@ -52,21 +54,21 @@ def main():
 
     if len(project_list) == 0:
         raise ValueError(
-            f"\n{halftab}No projects yet created.\n{halftab}To create a new project, run {templates['add_template']}."
+            reformat(f"No projects yet created. To create a new project, run {templates['add_template']}.", input_type="error")
         )
     if not d["ref_proj"]:
-        raise ValueError(f"\n{halftab}'ref_proj' must be provided.")
+        raise ValueError(reformat(f"'ref_proj' must be provided.", input_type="error"))
     if d["ref_proj"] not in project_list:
         raise ValueError(
-            f"\n{halftab}'{d['ref_proj']}' is not a valid project.\n{halftab}Available projects are {project_list}."
+            reformat(f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list}.", input_type="error")
         )
     if d["entry_type"] is None:
         raise ValueError(
-            f"\n{halftab}No entry type provided. One of ['task', 'ref', 'note'] within '{d['ref_proj']}' must be specified."
+            reformat(f"No entry type provided. One of ['task', 'ref', 'note'] within '{d['ref_proj']}' must be specified.", input_type="error")
         )
     elif d["pos"] is None:
         raise ValueError(
-            f"\n{halftab}No positional index provided. Index within {d['entry_type']} must be specified."
+            reformat(f"No positional index provided. Index within {d['entry_type']} must be specified.", input_type="error")
         )
 
     base_path = f"{data_path}/projects/{d['ref_proj']}"
@@ -75,27 +77,25 @@ def main():
     idx = define_idx(d["pos"])
     if idx not in list(df.index):
         raise ValueError(
-            f"Provided index not found in project '{d['ref_proj']}' file {d['entry_type']}s."
+            reformat(f"Provided index not found in project '{d['ref_proj']}' file {d['entry_type']}s.", input_type="error")
         )
     to_be_removed = df.iloc[idx]
-    os.system("printf '\e[3;0;0t'")
-    print_width = np.max([60,np.min([np.max([len(l) for l in to_be_removed.tolist() if type(l) is str])+21, 70])])
-    os.system(f"printf '\e[8;{len(to_be_removed)+6};{print_width}t'")
+    set_entry_size(to_be_removed)
     confirmed = input(
         f"\n{halftab}Are you sure you want to remove the below entry? (y/n)\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
     )
     while confirmed not in ["y", "Y"] + ["n", "N"]:
         confirmed = input(
-            f"\n{halftab}Accepted inputs are ['y', 'Y', 'n', 'N'."
+            reformat(f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input")
         )
     if confirmed in ["y", "Y"]:
         df = df.iloc[[i for i in df.index if i != idx]]
         df.to_csv(path, index=False)
         print(
-            f"{halftab}{d['entry_type'].capitalize()} item {d['pos']} removed successfully."
+            reformat(f"{d['entry_type'].capitalize()} item {d['pos']} removed successfully.")
         )
     else:
-        print(f"{halftab}Action cancelled.")
+        print(reformat("Action cancelled."))
 
     timed_sleep()
     lst.main(parse_args=False)

@@ -8,7 +8,7 @@ import os
 
 import pandas as pd
 
-from .helpers.helpers import check_init, data_path, halftab, timed_sleep
+from .helpers.helpers import check_init, data_path, timed_sleep, reformat
 from task_tracker import lst
 
 def main():
@@ -29,10 +29,10 @@ def main():
     d = vars(parser.parse_args())
 
     if not d["project"]:
-        raise ValueError(f"\n{halftab}'project' must be provided.")
+        raise ValueError(reformat("'project' must be provided.", input_type="error"))
     if os.path.exists(f"{data_path}/projects/{d['project']}"):
         raise ValueError(
-            f"\n{halftab}Project '{d['project']}' already exists."
+            reformat(f"Project '{d['project']}' already exists.", input_type="error")
         )
 
     base_path = f"{data_path}/projects/{d['project']}"
@@ -50,7 +50,7 @@ def main():
     project_list.append(d["project"])
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
 
-    print(f"{halftab}Project '{d['project']}' created successfully.")
+    print(reformat(f"Project '{d['project']}' created successfully."))
     
     timed_sleep()
     lst.main(parse_args=False)

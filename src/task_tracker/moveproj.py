@@ -8,8 +8,8 @@ from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
-    halftab,
-    timed_sleep
+    timed_sleep,
+    reformat
 )
 from task_tracker import lst
 
@@ -44,7 +44,7 @@ def main():
     project_list.insert(to_idx, proj_to_move)
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
     print(
-        f"{halftab}Project {proj_to_move} successfully moved from position {from_idx} to position {to_idx}."
+        reformat(f"Project {proj_to_move} successfully moved from position {from_idx} to position {to_idx}.")
     )
 
     timed_sleep()

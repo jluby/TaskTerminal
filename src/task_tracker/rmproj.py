@@ -7,7 +7,7 @@ import json
 import os
 from shutil import rmtree
 
-from .helpers.helpers import check_init, data_path, halftab, pkg_path, timed_sleep
+from .helpers.helpers import check_init, data_path, halftab, pkg_path, reformat, timed_sleep
 from task_tracker import lst
 
 # establish parameters
@@ -30,10 +30,10 @@ def main():
     d = vars(parser.parse_args())
 
     if not d["project"]:
-        raise ValueError(f"\n{halftab}'project' must be provided.")
+        raise ValueError(reformat("'project' must be provided.", input_type="error"))
     if not os.path.exists(f"{data_path}/projects/{d['project']}"):
         raise ValueError(
-            f"\n{halftab}Project '{d['project']}' does not exist."
+            reformat(f"Project '{d['project']}' does not exist.", input_type="error")
         )
 
     base_path = f"{data_path}/projects/{d['project']}"
@@ -43,7 +43,7 @@ def main():
     )
     while confirmed not in ["y", "Y"] + ["n", "N"]:
         confirmed = input(
-            f"\n{halftab}Accepted inputs are ['y', 'Y', 'n', 'N'."
+            reformat(f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input")
         )
     if confirmed in ["y", "Y"]:
         rmtree(base_path)
@@ -57,7 +57,7 @@ def main():
             json.dump(
                 hidden_list, open(f"{data_path}/hidden_project_list.json", "w")
             )
-        print(f"{halftab}Project '{d['project']}' removed successfully.")
+        print(reformat(f"Project '{d['project']}' removed successfully."))
 
     timed_sleep()
     lst.main(parse_args=False)
