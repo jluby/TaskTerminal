@@ -28,6 +28,14 @@ def main():
     )
     d = vars(parser.parse_args())
 
+    for project in project_list:
+        base_path = f"{data_path}/projects/{project}"
+        save_cols = cols[:2] + ["time_estimate"] + cols[2:]
+        pd.DataFrame(columns=save_cols).to_csv(
+            f"{base_path}/backburner.csv", index=False
+        )
+    exit()
+
     if not d["project"]:
         raise ValueError(reformat("'project' must be provided.", input_type="error"))
     if os.path.exists(f"{data_path}/projects/{d['project']}"):
@@ -37,15 +45,14 @@ def main():
 
     base_path = f"{data_path}/projects/{d['project']}"
     os.makedirs(base_path)
-    os.makedirs(f"{base_path}/archives")
-    for file in ["tasks", "refs", "notes"]:
-        save_cols = cols[:2] + ["time_estimate"] + cols[2:] if file == "tasks" else cols
+    for file in ["tasks", "refs", "notes", "backburner"]:
+        save_cols = cols[:2] + ["time_estimate"] + cols[2:] if file in ["tasks", "backburner"] else cols
         pd.DataFrame(columns=save_cols).to_csv(
             f"{base_path}/{file}.csv", index=False
         )
-        pd.DataFrame(columns=save_cols + ["datetime_archived"]).to_csv(
-            f"{base_path}/archives/{file}.csv", index=False
-        )
+    pd.DataFrame(columns=save_cols + ["datetime_archived"]).to_csv(
+        f"{base_path}/archives.csv", index=False
+    )
 
     project_list.append(d["project"])
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))

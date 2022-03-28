@@ -23,7 +23,7 @@ templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 hidden_list = json.load(open(f"{data_path}/hidden_project_list.json", "r"))
 project_list = [p for p in project_list if p not in hidden_list]
-lists = ["notes", "note", "tasks", "task", "refs", "ref"]
+lists = ["notes", "note", "tasks", "task", "refs", "ref", "archive", "archives", "backburner"]
 
 
 def main(parse_args=True):
@@ -87,10 +87,8 @@ def main(parse_args=True):
             reformat(f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list} or you may enter 'ALL' to see all projects. To create a new project directory, run {templates['add_template']}.", input_type="error")
         )
         
-    if d["file"][-1] != "s":
+    if d["file"][-1] != "s" and d["file"] != "backburner":
         d["file"] += "s"
-    if d["arc"] == True:
-        d["file"] = f"archives/{d['file']}"
 
     if d["ref_proj"] == "ALL":
         lines = []

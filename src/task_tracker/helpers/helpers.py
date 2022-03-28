@@ -99,7 +99,7 @@ def parse_entries(df: pd.DataFrame, file: str) -> None:
                 if row["flagged"]
                 else row["entry"]
             )
-            time_estimate = row["time_estimate"] if file == "tasks" else None
+            time_estimate = row["time_estimate"] if file in ["tasks", "backburner"] else None
             rowlines = parse_row(f"{i}\t{entry}", n_tab=1, time_estimate=time_estimate)
             lines += rowlines
     lines.append("-" * width)

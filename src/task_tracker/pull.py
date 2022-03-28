@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Move item from active list to archive."""
+"""Move item from backburner to active list or vice versa."""
 
 # base imports
 import argparse
 import json
-from datetime import datetime
 
 import pandas as pd
 
@@ -30,7 +29,7 @@ def main():
 
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(
-        description="Get entry to move to project archives."
+        description="Get entry to move from backburner to active task list."
     )
     parser.add_argument(
         "ref_proj",
@@ -43,6 +42,12 @@ def main():
         type=str,
         nargs="?",
         help="Position of entry.",
+    )
+    parser.add_argument(
+        "-U",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="If provided, reverse movement (move from tasks to backburner).",
     )
     d = vars(parser.parse_args())
 
@@ -63,34 +68,37 @@ def main():
             reformat(f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list}.", input_type="error")
         )
 
-    path = f"{data_path}/projects/{d['ref_proj']}/tasks.csv"
-    df = pd.read_csv(path)
+    task_path = f"{data_path}/projects/{d['ref_proj']}/tasks.csv"
+    back_path = f"{data_path}/projects/{d['ref_proj']}/backburner.csv"
+    if not d["U"]:
+        from_path = back_path; to_path = task_path
+        from_name = "tasks"
+    else:
+        from_path = task_path; to_path = back_path
+        from_name = "backburner"
+    from_df = pd.read_csv(from_path)
+    to_df = pd.read_csv(to_path)
     idx = define_idx(d["pos"])
-    if idx not in list(df.index):
+    if idx not in list(from_df.index):
         raise ValueError(
-            reformat(f"Provided index not found in project '{d['ref_proj']}' tasks", input_type="error")
+            reformat(f"Provided index not found in project '{d['ref_proj']}' {from_name}.", input_type="error")
         )
-    to_be_archived = df.iloc[idx]
+    to_be_archived = from_df.iloc[idx]
     set_entry_size(to_be_archived)
     confirmed = input(
-        f"\n{halftab}Are you sure you want to archive the below entry? (y/n)\n{halftab}This action cannot be undone.\n\n{to_be_archived}\n{halftab}"
+        f"\n{halftab}Are you sure you want to activate the below entry? (y/n)\n\n{to_be_archived}\n{halftab}"
     )
     while confirmed not in ["y", "Y"] + ["n", "N"]:
         confirmed = input(
             reformat(f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input")
         )
     if confirmed in ["y", "Y"]:
-        archive_path = f"{data_path}/projects/{d['ref_proj']}/archives.csv"
-        archive_df = pd.read_csv(archive_path)
-        archive_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        archive_df.loc[len(archive_df)] = to_be_archived.tolist() + [
-            archive_time
-        ]
-        archive_df.to_csv(archive_path, index=False)
-        df = df.iloc[[i for i in df.index if i != idx]]
-        df.to_csv(path, index=False)
+        to_df.loc[len(to_df)] = to_be_archived.tolist()
+        to_df.to_csv(to_path, index=False)
+        from_df = from_df.iloc[[i for i in from_df.index if i != idx]]
+        from_df.to_csv(from_path, index=False)
         print(
-            reformat(f"Task {d['pos']} archived successfully.")
+            reformat(f"{from_name.capitalize()} item {d['pos']} moved successfully.")
         )
     else:
         print(reformat("Action cancelled."))

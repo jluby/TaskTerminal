@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Delete item from list."""
+"""Edit list item."""
 
 # base imports
 import argparse
 import json
-import os
-import time
+from tkinter import E
 
 import pandas as pd
-import numpy as np
+pd.options.mode.chained_assignment = None
+from contextlib import suppress
 
 from .helpers.helpers import (
     check_init,
@@ -71,31 +71,35 @@ def main():
             reformat(f"No positional index provided. Index within {d['entry_type']} must be specified.", input_type="error")
         )
 
+    if d["entry_type"] != "backburner":
+        file_name = d["entry_type"] + "s"
+    else:
+        file_name = d["entry_type"]
+
     base_path = f"{data_path}/projects/{d['ref_proj']}"
-    path = f"{base_path}/{d['entry_type']}s.csv"
+    path = f"{base_path}/{file_name}.csv"
     df = pd.read_csv(path)
     idx = define_idx(d["pos"])
     if idx not in list(df.index):
         raise ValueError(
             reformat(f"Provided index not found in project '{d['ref_proj']}' file {d['entry_type']}s.", input_type="error")
         )
-    to_be_removed = df.iloc[idx]
-    set_entry_size(to_be_removed)
-    confirmed = input(
-        f"\n{halftab}Are you sure you want to remove the below entry? (y/n)\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
-    )
-    while confirmed not in ["y", "Y"] + ["n", "N"]:
-        confirmed = input(
-            reformat(f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input")
-        )
-    if confirmed in ["y", "Y"]:
-        df = df.iloc[[i for i in df.index if i != idx]]
-        df.to_csv(path, index=False)
-        print(
-            reformat(f"{d['entry_type'].capitalize()} item {d['pos']} removed successfully.")
-        )
-    else:
-        print(reformat("Action cancelled."))
+    to_be_edited = df.iloc[idx]
+    to_be_edited.index = [f"{c} ({i})" for i, c in enumerate(to_be_edited.index)]
+    set_entry_size(to_be_edited)
+    val_idx = int(input(f"\n{halftab}Which item would you like to edit (enter index)?\n\n{to_be_edited}\n{halftab}"))
+    print(f"\n{halftab}The value was:\n\t{to_be_edited[val_idx]}\n{halftab}{type(to_be_edited[val_idx])}")
+    new_value = None
+    while type(new_value) != type(to_be_edited[val_idx]):
+            with suppress(ValueError):
+                new_value = input(reformat("What would you like to replace it with?", input_type="input"))
+                new_value = type(to_be_edited[val_idx])(new_value)
+
+    to_be_edited.iloc[val_idx] = new_value
+    df.iloc[idx] = to_be_edited.tolist()
+    df.to_csv(path, index=False)
+    
+    print(reformat("Item successfully edited."))
 
     timed_sleep()
     lst.main(parse_args=False)

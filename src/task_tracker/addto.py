@@ -41,7 +41,7 @@ def main():
         type=str,
         nargs="?",
         default="task",
-        choices=["task", "tasks", "ref", "refs", "note", "notes"],
+        choices=["task", "ref", "note", "backburner"],
         help="Project list to which entry will be added.",
     )
     parser.add_argument(
@@ -73,10 +73,12 @@ def main():
             reformat(f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list}.", input_type="error")
         )
 
-    if d["entry_type"][-1] == "s":
-        d["entry_type"] = d["entry_type"][:-1]
+    if d["entry_type"] != "backburner":
+        file_name = d["entry_type"] + "s"
+    else:
+        file_name = d["entry_type"]
 
-    path = f"{data_path}/projects/{d['ref_proj']}/{d['entry_type']}s.csv"
+    path = f"{data_path}/projects/{d['ref_proj']}/{file_name}.csv"
     df = pd.read_csv(path)
     entry = ""
     description = ""
@@ -86,7 +88,7 @@ def main():
     description_str = f"Describe {d['entry_type']}:" if d['entry_type'] != "ref" else f"Paste reference below:"
     description = input(reformat(description_str, input_type="input"))
     entry_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    if d["entry_type"] == "task":
+    if d["entry_type"] in ["task", "backburner"]:
         time_estimate = ""
         while type(time_estimate) is not float:
             with suppress(ValueError):
