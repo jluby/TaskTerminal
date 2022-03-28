@@ -23,7 +23,7 @@ CLEAN_DIR_REGEX_INCLUDED = $(PACKAGE_DIR)
 ## help :		print this help.
 .PHONY: help
 help: Makefile
-	@echo "\nCAAI package for building deep learning models of sudden cardiac death in the Halland (SWE) data environment."
+	@echo "\nPersonal package for managing project TODOs, notes, and references."
 	@echo "\n	Generic commands"
 	@sed -n 's/^## /		/p' $< | sort
 

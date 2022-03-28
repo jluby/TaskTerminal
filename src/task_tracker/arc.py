@@ -8,17 +8,18 @@ from datetime import datetime
 
 import pandas as pd
 
+from task_tracker import lst
+
 from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
     halftab,
     pkg_path,
-    timed_sleep,
     reformat,
-    set_entry_size
+    set_entry_size,
+    timed_sleep,
 )
-from task_tracker import lst
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
@@ -48,19 +49,30 @@ def main():
 
     if not d["ref_proj"] or not d["pos"]:
         raise ValueError(
-            reformat(f"'ref_proj' and 'pos' must be provided.", input_type="error")
+            reformat(
+                f"'ref_proj' and 'pos' must be provided.", input_type="error"
+            )
         )
     if d["pos"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
         raise ValueError(
-            reformat(f"'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100", input_type="error")
+            reformat(
+                f"'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100",
+                input_type="error",
+            )
         )
     if len(project_list) == 0:
         raise ValueError(
-            reformat(f"No projects yet created. To create a new project, run {templates['add_template']}", input_type="error")
+            reformat(
+                f"No projects yet created. To create a new project, run {templates['add_template']}",
+                input_type="error",
+            )
         )
     if d["ref_proj"] not in project_list:
         raise ValueError(
-            reformat(f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list}.", input_type="error")
+            reformat(
+                f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list}.",
+                input_type="error",
+            )
         )
 
     path = f"{data_path}/projects/{d['ref_proj']}/tasks.csv"
@@ -68,7 +80,10 @@ def main():
     idx = define_idx(d["pos"])
     if idx not in list(df.index):
         raise ValueError(
-            reformat(f"Provided index not found in project '{d['ref_proj']}' tasks", input_type="error")
+            reformat(
+                f"Provided index not found in project '{d['ref_proj']}' tasks",
+                input_type="error",
+            )
         )
     to_be_archived = df.iloc[idx]
     set_entry_size(to_be_archived)
@@ -77,7 +92,9 @@ def main():
     )
     while confirmed not in ["y", "Y"] + ["n", "N"]:
         confirmed = input(
-            reformat(f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input")
+            reformat(
+                f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input"
+            )
         )
     if confirmed in ["y", "Y"]:
         archive_path = f"{data_path}/projects/{d['ref_proj']}/archives.csv"
@@ -89,9 +106,7 @@ def main():
         archive_df.to_csv(archive_path, index=False)
         df = df.iloc[[i for i in df.index if i != idx]]
         df.to_csv(path, index=False)
-        print(
-            reformat(f"Task {d['pos']} archived successfully.")
-        )
+        print(reformat(f"Task {d['pos']} archived successfully."))
     else:
         print(reformat("Action cancelled."))
 

@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from task_tracker import lst
+
 from .helpers.helpers import (
     check_init,
     data_path,
@@ -14,10 +16,9 @@ from .helpers.helpers import (
     halftab,
     move,
     pkg_path,
+    reformat,
     timed_sleep,
-    reformat
 )
-from task_tracker import lst
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
@@ -58,30 +59,44 @@ def main():
 
     if len(project_list) == 0:
         raise ValueError(
-            reformat(f"No projects yet created. To create a new project, run {templates['add_template']}.", input_type="error")
+            reformat(
+                f"No projects yet created. To create a new project, run {templates['add_template']}.",
+                input_type="error",
+            )
         )
     if not d["ref_proj"]:
-        raise ValueError(reformat(f"'ref_proj' must be provided.", input_type="error"))
+        raise ValueError(
+            reformat(f"'ref_proj' must be provided.", input_type="error")
+        )
     if d["ref_proj"] not in project_list:
         raise ValueError(
-            reformat(f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list}.", input_type="error")
+            reformat(
+                f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list}.",
+                input_type="error",
+            )
         )
     if d["entry_type"] is None:
         raise ValueError(
-            reformat(f"No entry type provided. One of ['task', 'ref', 'note'] must be specified within '{d['ref_proj']}'.", input_type="error")
+            reformat(
+                f"No entry type provided. One of ['task', 'ref', 'note'] must be specified within '{d['ref_proj']}'.",
+                input_type="error",
+            )
         )
     if not set([d["to"], d["from"]]).issubset(
         [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]
     ):
         raise ValueError(
-            reformat("'from' and 'to' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.", input_type="error")
+            reformat(
+                "'from' and 'to' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.",
+                input_type="error",
+            )
         )
 
     if d["entry_type"] not in ["back", "backburner"]:
         file = d["entry_type"] + "s"
     if d["entry_type"] == "back":
         file = "backburner"
-    
+
     from_idx = define_idx(d["from"])
     to_idx = define_idx(d["to"])
     path = f"{data_path}/projects/{d['ref_proj']}/{file}.csv"

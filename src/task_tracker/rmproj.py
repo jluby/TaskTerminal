@@ -7,8 +7,16 @@ import json
 import os
 from shutil import rmtree
 
-from .helpers.helpers import check_init, data_path, halftab, pkg_path, reformat, timed_sleep
 from task_tracker import lst
+
+from .helpers.helpers import (
+    check_init,
+    data_path,
+    halftab,
+    pkg_path,
+    reformat,
+    timed_sleep,
+)
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
@@ -30,10 +38,14 @@ def main():
     d = vars(parser.parse_args())
 
     if not d["project"]:
-        raise ValueError(reformat("'project' must be provided.", input_type="error"))
+        raise ValueError(
+            reformat("'project' must be provided.", input_type="error")
+        )
     if not os.path.exists(f"{data_path}/projects/{d['project']}"):
         raise ValueError(
-            reformat(f"Project '{d['project']}' does not exist.", input_type="error")
+            reformat(
+                f"Project '{d['project']}' does not exist.", input_type="error"
+            )
         )
 
     base_path = f"{data_path}/projects/{d['project']}"
@@ -43,7 +55,9 @@ def main():
     )
     while confirmed not in ["y", "Y"] + ["n", "N"]:
         confirmed = input(
-            reformat(f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input")
+            reformat(
+                f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input"
+            )
         )
     if confirmed in ["y", "Y"]:
         rmtree(base_path)

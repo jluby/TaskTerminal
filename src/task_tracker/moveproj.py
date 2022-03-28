@@ -4,17 +4,19 @@
 import argparse
 import json
 
+from task_tracker import lst
+
 from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
+    reformat,
     timed_sleep,
-    reformat
 )
-from task_tracker import lst
 
 # establish parameters
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
+
 
 def main():
     check_init()
@@ -44,7 +46,9 @@ def main():
     project_list.insert(to_idx, proj_to_move)
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
     print(
-        reformat(f"Project {proj_to_move} successfully moved from position {from_idx} to position {to_idx}.")
+        reformat(
+            f"Project {proj_to_move} successfully moved from position {from_idx} to position {to_idx}."
+        )
     )
 
     timed_sleep()

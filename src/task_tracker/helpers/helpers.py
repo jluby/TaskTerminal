@@ -1,11 +1,11 @@
 # base imports
 import json
 import os
-from pathlib import Path
 import time
+from pathlib import Path
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from termcolor import colored
 
 pkg_path = Path(__file__).parents[1]
@@ -13,10 +13,23 @@ data_path = f"{pkg_path}/.package_data"
 
 halftab = " " * 4
 
+
 def set_entry_size(entry):
-    print_width = np.max([60,np.min([np.max([len(l) for l in entry.tolist() if type(l) is str])+21, 70])])
+    print_width = np.max(
+        [
+            60,
+            np.min(
+                [
+                    np.max([len(l) for l in entry.tolist() if type(l) is str])
+                    + 21,
+                    70,
+                ]
+            ),
+        ]
+    )
     os.system("printf '\e[3;0;0t'")
     os.system(f"printf '\e[8;{len(entry)+6};{print_width}t'")
+
 
 def reformat(string: str, input_type: str = None):
     string = string.replace(". ", ".@")
@@ -31,8 +44,10 @@ def reformat(string: str, input_type: str = None):
         newstring += s
     return newstring
 
+
 def timed_sleep():
     time.sleep(1.5)
+
 
 def print_lines(lines: list) -> None:
     width = np.max([len(line) for line in lines]) + 2
@@ -40,6 +55,7 @@ def print_lines(lines: list) -> None:
     os.system("printf '\e[3;0;0t'")
     os.system(f"printf '\e[8;{height};{width}t'")
     [print(line) for line in lines]
+
 
 def check_init() -> None:
     if not os.path.isdir(data_path):
@@ -99,14 +115,21 @@ def parse_entries(df: pd.DataFrame, file: str) -> None:
                 if row["flagged"]
                 else row["entry"]
             )
-            time_estimate = row["time_estimate"] if file in ["tasks", "backburner"] else None
-            rowlines = parse_row(f"{i}\t{entry}", n_tab=1, time_estimate=time_estimate)
+            time_estimate = (
+                row["time_estimate"]
+                if file in ["tasks", "backburner"]
+                else None
+            )
+            rowlines = parse_row(
+                f"{i}\t{entry}", n_tab=1, time_estimate=time_estimate
+            )
             lines += rowlines
     lines.append("-" * width)
     return lines
 
+
 def parse_description(df_row: pd.DataFrame) -> list:
-    return [''] + parse_row(f"{df_row['description']}") + ['']
+    return [""] + parse_row(f"{df_row['description']}") + [""]
 
 
 def define_idx(pos) -> int:

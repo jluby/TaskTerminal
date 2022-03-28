@@ -8,8 +8,10 @@ import os
 
 import pandas as pd
 
-from .helpers.helpers import check_init, data_path, timed_sleep, reformat
 from task_tracker import lst
+
+from .helpers.helpers import check_init, data_path, reformat, timed_sleep
+
 
 def main():
     check_init()
@@ -37,16 +39,24 @@ def main():
     exit()
 
     if not d["project"]:
-        raise ValueError(reformat("'project' must be provided.", input_type="error"))
+        raise ValueError(
+            reformat("'project' must be provided.", input_type="error")
+        )
     if os.path.exists(f"{data_path}/projects/{d['project']}"):
         raise ValueError(
-            reformat(f"Project '{d['project']}' already exists.", input_type="error")
+            reformat(
+                f"Project '{d['project']}' already exists.", input_type="error"
+            )
         )
 
     base_path = f"{data_path}/projects/{d['project']}"
     os.makedirs(base_path)
     for file in ["tasks", "refs", "notes", "backburner"]:
-        save_cols = cols[:2] + ["time_estimate"] + cols[2:] if file in ["tasks", "backburner"] else cols
+        save_cols = (
+            cols[:2] + ["time_estimate"] + cols[2:]
+            if file in ["tasks", "backburner"]
+            else cols
+        )
         pd.DataFrame(columns=save_cols).to_csv(
             f"{base_path}/{file}.csv", index=False
         )
@@ -58,7 +68,7 @@ def main():
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
 
     print(reformat(f"Project '{d['project']}' created successfully."))
-    
+
     timed_sleep()
     lst.main(parse_args=False)
 
