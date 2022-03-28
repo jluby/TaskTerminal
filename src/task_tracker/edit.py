@@ -42,7 +42,7 @@ def main():
         "entry_type",
         type=str,
         nargs="?",
-        choices=["task", "ref", "note", "archive", "backburner"],
+        choices=["task", "ref", "note", "archive", "back", "backburner"],
         help="Project list from which entry will be removed.",
     )
     parser.add_argument(
@@ -64,17 +64,17 @@ def main():
         )
     if d["entry_type"] is None:
         raise ValueError(
-            reformat(f"No entry type provided. One of ['task', 'ref', 'note'] within '{d['ref_proj']}' must be specified.", input_type="error")
+            reformat(f"No entry type provided. One of ['task', 'ref', 'note', 'backburner' (or 'back')] within '{d['ref_proj']}' must be specified.", input_type="error")
         )
     elif d["pos"] is None:
         raise ValueError(
             reformat(f"No positional index provided. Index within {d['entry_type']} must be specified.", input_type="error")
         )
 
-    if d["entry_type"] != "backburner":
+    if d["entry_type"] not in ["back", "backburner"]:
         file_name = d["entry_type"] + "s"
     else:
-        file_name = d["entry_type"]
+        file_name = "backburner"
 
     base_path = f"{data_path}/projects/{d['ref_proj']}"
     path = f"{base_path}/{file_name}.csv"

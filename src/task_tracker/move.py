@@ -39,7 +39,7 @@ def main():
         "entry_type",
         type=str,
         nargs="?",
-        choices=["task", "ref", "note"],
+        choices=["task", "ref", "note", "back", "backburner", "archive"],
         help="List in which entry will be moved.",
     )
     parser.add_argument(
@@ -77,9 +77,14 @@ def main():
             reformat("'from' and 'to' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.", input_type="error")
         )
 
+    if d["entry_type"] not in ["back", "backburner"]:
+        file = d["entry_type"] + "s"
+    if d["entry_type"] == "back":
+        file = "backburner"
+    
     from_idx = define_idx(d["from"])
     to_idx = define_idx(d["to"])
-    path = f"{data_path}/projects/{d['ref_proj']}/{d['entry_type']}s.csv"
+    path = f"{data_path}/projects/{d['ref_proj']}/{file}.csv"
     df = pd.read_csv(path)
     df = move(df, from_index=from_idx, to_index=to_idx)
     df.to_csv(path, index=False)

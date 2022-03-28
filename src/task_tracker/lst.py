@@ -23,7 +23,7 @@ templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 hidden_list = json.load(open(f"{data_path}/hidden_project_list.json", "r"))
 project_list = [p for p in project_list if p not in hidden_list]
-lists = ["notes", "note", "tasks", "task", "refs", "ref", "archive", "archives", "backburner"]
+lists = ["notes", "note", "tasks", "task", "refs", "ref", "archive", "archives", "back", "backburner"]
 
 
 def main(parse_args=True):
@@ -89,6 +89,8 @@ def main(parse_args=True):
         
     if d["file"][-1] != "s" and d["file"] != "backburner":
         d["file"] += "s"
+    if d["file"] == "back":
+        d["file"] = "backburner"
 
     if d["ref_proj"] == "ALL":
         lines = []

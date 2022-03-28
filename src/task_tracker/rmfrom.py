@@ -5,6 +5,7 @@
 import argparse
 import json
 import os
+from re import L
 import time
 
 import pandas as pd
@@ -42,7 +43,7 @@ def main():
         "entry_type",
         type=str,
         nargs="?",
-        choices=["task", "ref", "note", "archive", "backburner"],
+        choices=["task", "ref", "note", "archive", "back", "backburner"],
         help="Project list from which entry will be removed.",
     )
     parser.add_argument(
@@ -71,8 +72,13 @@ def main():
             reformat(f"No positional index provided. Index within {d['entry_type']} must be specified.", input_type="error")
         )
 
+    if d["entry_type"] not in ["back", "backburner"]:
+        file = d["entry_type"] + "s"
+    else:
+        file = "backburner"
+
     base_path = f"{data_path}/projects/{d['ref_proj']}"
-    path = f"{base_path}/{d['entry_type']}s.csv"
+    path = f"{base_path}/{file}.csv"
     df = pd.read_csv(path)
     idx = define_idx(d["pos"])
     if idx not in list(df.index):
