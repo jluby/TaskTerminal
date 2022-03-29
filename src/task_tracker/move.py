@@ -94,8 +94,9 @@ def main():
 
     if d["entry_type"] not in ["back", "backburner"]:
         file = d["entry_type"] + "s"
-    if d["entry_type"] == "back":
+    else:
         file = "backburner"
+        d["entry_type"] = "backburner"
 
     from_idx = define_idx(d["from"])
     to_idx = define_idx(d["to"])

@@ -91,6 +91,7 @@ def main():
         file_name = d["entry_type"] + "s"
     else:
         file_name = "backburner"
+        d["entry_type"] = "backburner"
 
     base_path = f"{data_path}/projects/{d['ref_proj']}"
     path = f"{base_path}/{file_name}.csv"
@@ -99,7 +100,7 @@ def main():
     if idx not in list(df.index):
         raise ValueError(
             reformat(
-                f"Provided index not found in project '{d['ref_proj']}' file {d['entry_type']}s.",
+                f"Provided index not found in project '{d['ref_proj']}' file {file_name}.",
                 input_type="error",
             )
         )

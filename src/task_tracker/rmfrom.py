@@ -88,18 +88,19 @@ def main():
         )
 
     if d["entry_type"] not in ["back", "backburner"]:
-        file = d["entry_type"] + "s"
+        filename = d["entry_type"] + "s"
     else:
-        file = "backburner"
+        filename = "backburner"
+        d["entry_type"] = "backburner"
 
     base_path = f"{data_path}/projects/{d['ref_proj']}"
-    path = f"{base_path}/{file}.csv"
+    path = f"{base_path}/{filename}.csv"
     df = pd.read_csv(path)
     idx = define_idx(d["pos"])
     if idx not in list(df.index):
         raise ValueError(
             reformat(
-                f"Provided index not found in project '{d['ref_proj']}' file {d['entry_type']}s.",
+                f"Provided index not found in project '{d['ref_proj']}' file {filename}.",
                 input_type="error",
             )
         )

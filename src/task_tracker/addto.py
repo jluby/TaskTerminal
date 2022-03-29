@@ -90,6 +90,7 @@ def main():
         file_name = d["entry_type"] + "s"
     else:
         file_name = "backburner"
+        d["entry_type"] = "backburner"
 
     path = f"{data_path}/projects/{d['ref_proj']}/{file_name}.csv"
     df = pd.read_csv(path)
