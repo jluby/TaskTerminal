@@ -112,7 +112,7 @@ def main(parse_args=True):
 
     if d["file"][-1] != "s" and d["file"] != "backburner":
         d["file"] += "s"
-    if d["file"] == "back":
+    if d["file"] in ["back", "backburner"]:
         d["file"] = "backburner"
 
     if d["ref_proj"] == "ALL":
