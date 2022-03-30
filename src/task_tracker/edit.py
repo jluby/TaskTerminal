@@ -4,9 +4,9 @@
 # base imports
 import argparse
 import json
-from tkinter import E
 
 import pandas as pd
+import numpy as np
 
 pd.options.mode.chained_assignment = None
 from contextlib import suppress
@@ -22,6 +22,8 @@ from .helpers.helpers import (
     reformat,
     set_entry_size,
     timed_sleep,
+    split_to_width,
+    set_entry_size_manual
 )
 
 # establish parameters
@@ -114,9 +116,9 @@ def main():
             f"\n{halftab}Which item would you like to edit (enter index)?\n\n{to_be_edited}\n{halftab}"
         )
     )
-    print(
-        f"\n{halftab}The value was:\n\t{to_be_edited[val_idx]}\n{halftab}{type(to_be_edited[val_idx])}"
-    )
+    edit_lines = split_to_width(str(to_be_edited[val_idx]), linelen=50)
+    set_entry_size_manual(5+len(edit_lines), np.max([len(l) for l in edit_lines])+10)
+    print(f"\n{halftab}The value was:\n\t"); [print(f"{halftab}{l}") for l in edit_lines]; print(f"{halftab}{type(to_be_edited[val_idx])}\n")
     new_value = None
     while type(new_value) != type(to_be_edited[val_idx]):
         with suppress(ValueError):

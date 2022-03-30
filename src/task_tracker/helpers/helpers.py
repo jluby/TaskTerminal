@@ -8,10 +8,16 @@ import numpy as np
 import pandas as pd
 from termcolor import colored
 
+# TODO: fix flagged printing
+
 pkg_path = Path(__file__).parents[1]
 data_path = f"{pkg_path}/.package_data"
 
 halftab = " " * 4
+
+def set_entry_size_manual(height, width):
+    os.system("printf '\e[3;0;0t'")
+    os.system(f"printf '\e[8;{height};{width}t'")
 
 
 def set_entry_size(entry, additional_height=6, additional_width=21, min_width=60, max_width=70):
@@ -27,9 +33,7 @@ def set_entry_size(entry, additional_height=6, additional_width=21, min_width=60
             ),
         ]
     )
-    print(print_width)
-    os.system("printf '\e[3;0;0t'")
-    os.system(f"printf '\e[8;{len(entry)+additional_height};{print_width}t'")
+    set_entry_size_manual(len(entry)+additional_height, print_width)
 
 
 def reformat(string: str, input_type: str = None):
@@ -51,10 +55,9 @@ def timed_sleep():
 
 
 def print_lines(lines: list) -> None:
-    width = np.max([len(line) for line in lines]) + 2
+    width = np.max([len(line) for line in lines]) + 1
     height = len(lines) + 1
-    os.system("printf '\e[3;0;0t'")
-    os.system(f"printf '\e[8;{height};{width}t'")
+    set_entry_size_manual(height, width)
     [print(line) for line in lines]
 
 
