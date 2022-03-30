@@ -94,12 +94,10 @@ def split_to_width(string: str, linelen: int) -> list:
 
 
 def parse_row(
-    string: str, n_tab: int = 0, time_estimate: float = None
-) -> None:
-    entry_char_limit = 30
+    string: str, n_tab: int = 0, time_estimate: float = None, entry_width=40) -> None:
     lines = []
     for l in string.split(sep="|"):
-        newlines = split_to_width(l, linelen=entry_char_limit)
+        newlines = split_to_width(l, linelen=entry_width)
         lines += newlines
     timestamp = f"{time_estimate}hrs" if time_estimate else ""
     line0 = halftab + lines[0] + halftab + timestamp
@@ -125,7 +123,7 @@ def parse_entries(df: pd.DataFrame, file: str) -> None:
                 else None
             )
             rowlines = parse_row(
-                f"{i}\t{entry}", n_tab=1, time_estimate=time_estimate
+                f"{i}\t{entry}", n_tab=1, time_estimate=time_estimate, entry_width=width-17
             )
             lines += rowlines
     lines.append("-" * width)
