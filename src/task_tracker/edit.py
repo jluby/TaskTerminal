@@ -108,7 +108,7 @@ def main():
     to_be_edited.index = [
         f"{c} ({i})" for i, c in enumerate(to_be_edited.index)
     ]
-    set_entry_size(to_be_edited, additional_height=5, additional_width=26)
+    set_entry_size(to_be_edited, min_width=49, max_width=74, additional_height=5, additional_width=25)
     val_idx = int(
         input(
             f"\n{halftab}Which item would you like to edit (enter index)?\n\n{to_be_edited}\n{halftab}"

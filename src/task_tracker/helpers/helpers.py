@@ -14,19 +14,20 @@ data_path = f"{pkg_path}/.package_data"
 halftab = " " * 4
 
 
-def set_entry_size(entry, additional_height=6, base_width=60, additional_width=21):
+def set_entry_size(entry, additional_height=6, additional_width=21, min_width=60, max_width=70):
     print_width = np.max(
         [
-            base_width,
+            min_width,
             np.min(
                 [
                     np.max([len(l) for l in entry.tolist() if type(l) is str])
                     + additional_width,
-                    70,
+                    max_width,
                 ]
             ),
         ]
     )
+    print(print_width)
     os.system("printf '\e[3;0;0t'")
     os.system(f"printf '\e[8;{len(entry)+additional_height};{print_width}t'")
 

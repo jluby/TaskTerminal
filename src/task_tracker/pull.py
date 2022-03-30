@@ -102,7 +102,7 @@ def main():
         )
     to_be_archived = from_df.iloc[idx]
     de = "de" if d["U"] else ""
-    set_entry_size(to_be_archived, additional_height=5, base_width=62 if d["U"] else 60)
+    set_entry_size(to_be_archived, additional_height=5, min_width=62 if d["U"] else 60)
     confirmed = input(
         f"\n{halftab}Are you sure you want to {de}activate the below entry? (y/n)\n\n{to_be_archived}\n{halftab}"
     )
