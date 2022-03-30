@@ -47,7 +47,7 @@ def main(parse_args=True):
         type=str,
         nargs="?",
         default="ALL",
-        choices=project_list + ["ALL"],
+        choices=project_list + ["all", "ALL"],
         help="Projects to display.",
     )
     parser.add_argument(
@@ -81,7 +81,7 @@ def main(parse_args=True):
     else:
         d = vars(parser.parse_args([]))
 
-    if d["pos"] and d["ref_proj"] == "ALL":
+    if d["pos"] and d["ref_proj"] in ["all", "ALL"]:
         raise ValueError(
             reformat(
                 f"Use of 'pos' kwarg requires specification of a single project.",
@@ -102,7 +102,7 @@ def main(parse_args=True):
                 input_type="error",
             )
         )
-    elif d["ref_proj"] not in project_list and d["ref_proj"] != "ALL":
+    elif d["ref_proj"] not in project_list and d["ref_proj"] not in ["all", "ALL"]:
         raise ValueError(
             reformat(
                 f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list} or you may enter 'ALL' to see all projects. To create a new project directory, run {templates['add_template']}.",
@@ -115,7 +115,7 @@ def main(parse_args=True):
     elif d["file"] in ["back", "backburner"]:
         d["file"] = "backburner"
 
-    if d["ref_proj"] == "ALL":
+    if d["ref_proj"] in ["all", "ALL"]:
         lines = []
         for proj in project_list:
             df = pd.read_csv(f"{data_path}/projects/{proj}/{d['file']}.csv")
