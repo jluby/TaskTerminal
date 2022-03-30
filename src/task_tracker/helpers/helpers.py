@@ -14,21 +14,21 @@ data_path = f"{pkg_path}/.package_data"
 halftab = " " * 4
 
 
-def set_entry_size(entry):
+def set_entry_size(entry, additional_height=6, additional_width=21):
     print_width = np.max(
         [
             60,
             np.min(
                 [
                     np.max([len(l) for l in entry.tolist() if type(l) is str])
-                    + 21,
+                    + additional_width,
                     70,
                 ]
             ),
         ]
     )
     os.system("printf '\e[3;0;0t'")
-    os.system(f"printf '\e[8;{len(entry)+6};{print_width}t'")
+    os.system(f"printf '\e[8;{len(entry)+additional_height};{print_width}t'")
 
 
 def reformat(string: str, input_type: str = None):

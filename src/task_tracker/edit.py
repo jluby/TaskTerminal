@@ -108,7 +108,7 @@ def main():
     to_be_edited.index = [
         f"{c} ({i})" for i, c in enumerate(to_be_edited.index)
     ]
-    set_entry_size(to_be_edited)
+    set_entry_size(to_be_edited, additional_height=5, additional_width=26)
     val_idx = int(
         input(
             f"\n{halftab}Which item would you like to edit (enter index)?\n\n{to_be_edited}\n{halftab}"
@@ -126,6 +126,8 @@ def main():
                     input_type="input",
                 )
             )
+            if to_be_edited.index[val_idx][:4] == "desc" and type(new_value) is str:
+                break
             new_value = type(to_be_edited[val_idx])(new_value)
 
     to_be_edited.iloc[val_idx] = new_value

@@ -130,7 +130,12 @@ def main():
             entry_time,
         ]
     else:
-        df.loc[len(df)] = [entry, description, d["flag"], entry_time]
+        df.loc[len(df)] = [
+            entry,
+            description,
+            d["flag"],
+            entry_time,
+        ]
     df = move(df, from_index=-1, to_index=define_idx(d["pos"]))
     df.to_csv(path, index=False)
     print(
