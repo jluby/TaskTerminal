@@ -41,7 +41,7 @@ def main():
     parser.add_argument(
         "pos",
         type=str,
-        nargs="?",
+        nargs="+",
         help="Position of entry.",
     )
     parser.add_argument(
@@ -55,13 +55,13 @@ def main():
     if not d["ref_proj"] or not d["pos"]:
         raise ValueError(
             reformat(
-                f"'ref_proj' and 'pos' must be provided.", input_type="error"
+                f"'ref_proj' and at least one 'pos' must be provided.", input_type="error"
             )
         )
-    if d["pos"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
+    if not all(x in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)] for x in d["pos"]):
         raise ValueError(
             reformat(
-                f"'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100",
+                f"'pos' entries must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100",
                 input_type="error",
             )
         )
@@ -85,47 +85,49 @@ def main():
     if not d["U"]:
         from_path = back_path
         to_path = task_path
-        from_name = "tasks"
+        from_name = "backburner"
     else:
         from_path = task_path
         to_path = back_path
-        from_name = "backburner"
+        from_name = "tasks"
     from_df = pd.read_csv(from_path)
     to_df = pd.read_csv(to_path)
-    idx = define_idx(d["pos"])
-    if idx not in list(from_df.index):
-        raise ValueError(
-            reformat(
-                f"Provided index not found in project '{d['ref_proj']}' {from_name}.",
-                input_type="error",
+    for pos in d['pos']:
+        idx = define_idx(pos)
+        if idx not in list(from_df.index):
+            raise ValueError(
+                reformat(
+                    f"Provided index not found in project '{d['ref_proj']}' {from_name}.",
+                    input_type="error",
+                )
             )
-        )
-    to_be_archived = from_df.iloc[idx]
-    de = "de" if d["U"] else ""
-    set_entry_size(to_be_archived, additional_height=5, min_width=62 if d["U"] else 60)
-    confirmed = input(
-        f"\n{halftab}Are you sure you want to {de}activate the below entry? (y/n)\n\n{to_be_archived}\n{halftab}"
-    )
-    while confirmed not in ["y", "Y"] + ["n", "N"]:
+        to_be_moved = from_df.iloc[idx]
+        de = "de" if d["U"] else ""
+        q_str = halftab + f"{f'{de}activate'.capitalize()} the below entry? (y/n)"
+        set_entry_size(to_be_moved, additional_height=5, min_width=len(q_str)+1)
         confirmed = input(
-            reformat(
-                f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input"
-            )
+            f"\n{q_str}\n\n{to_be_moved}\n{halftab}"
         )
-    if confirmed in ["y", "Y"]:
-        to_df.loc[len(to_df)] = to_be_archived.tolist()
-        to_df.to_csv(to_path, index=False)
-        from_df = from_df.iloc[[i for i in from_df.index if i != idx]]
-        from_df.to_csv(from_path, index=False)
-        print(
-            reformat(
-                f"{from_name.capitalize()} item {d['pos']} moved successfully."
+        while confirmed not in ["y", "Y"] + ["n", "N"]:
+            confirmed = input(
+                reformat(
+                    f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input"
+                )
             )
-        )
-    else:
-        print(reformat("Action cancelled."))
+        if confirmed in ["y", "Y"]:
+            to_df.loc[len(to_df)] = to_be_moved.tolist()
+            to_df.to_csv(to_path, index=False)
+            from_df = from_df.iloc[[i for i in from_df.index if i != idx]]
+            from_df.to_csv(from_path, index=False)
+            print(
+                reformat(
+                    f"{from_name.capitalize()} item {pos} moved successfully."
+                )
+            )
+        else:
+            print(reformat("Action cancelled."))
+        timed_sleep()
 
-    timed_sleep()
     lst.main(parse_args=False)
 
 

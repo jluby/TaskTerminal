@@ -8,8 +8,6 @@ import numpy as np
 import pandas as pd
 from termcolor import colored
 
-# TODO: fix flagged printing
-
 pkg_path = Path(__file__).parents[1]
 data_path = f"{pkg_path}/.package_data"
 
@@ -20,7 +18,7 @@ def set_entry_size_manual(height, width):
     os.system(f"printf '\e[8;{height};{width}t'")
 
 
-def set_entry_size(entry, additional_height=6, additional_width=21, min_width=60, max_width=70):
+def set_entry_size(entry, additional_height=6, additional_width=22, min_width=60, max_width=70):
     print_width = np.max(
         [
             min_width,
@@ -50,8 +48,8 @@ def reformat(string: str, input_type: str = None):
     return newstring
 
 
-def timed_sleep():
-    time.sleep(1.5)
+def timed_sleep(t=1):
+    time.sleep(t)
 
 
 def print_lines(lines: list, width: int) -> None:
@@ -128,7 +126,7 @@ def process_rowlines(idx, lines, time_estimate, linelen, flagged):
     if flagged:
         linelen -= 13
     estimate_str = f"{time_estimate}hrs" if time_estimate else ""
-    lines_p.append(f"{halftab}{idx}{halftab}{lines[0]: <{linelen}}{halftab}{estimate_str}")
+    lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{estimate_str}")
     for line in lines[1:]:
         lines_p.append(f"{' '*9}{line: <{linelen}}")
     return lines_p

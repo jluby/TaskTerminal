@@ -105,9 +105,10 @@ def main():
             )
         )
     to_be_removed = df.iloc[idx]
-    set_entry_size(to_be_removed)
+    q_str = halftab + "Remove the below entry? (y/n)"
+    set_entry_size(to_be_removed, min_width=len(q_str)+1)
     confirmed = input(
-        f"\n{halftab}Are you sure you want to remove the below entry? (y/n)\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
+        f"\n{q_str}\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
     )
     while confirmed not in ["y", "Y"] + ["n", "N"]:
         confirmed = input(

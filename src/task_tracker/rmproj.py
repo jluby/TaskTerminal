@@ -51,7 +51,7 @@ def main():
     base_path = f"{data_path}/projects/{d['project']}"
     confirmed = None
     confirmed = input(
-        f"Are you sure you want to remove {d['project']}? (y/n)\n{halftab}This action cannot be undone.\n{halftab}"
+        f"Remove {d['project']}? (y/n)\n{halftab}This action cannot be undone.\n{halftab}"
     )
     while confirmed not in ["y", "Y"] + ["n", "N"]:
         confirmed = input(
