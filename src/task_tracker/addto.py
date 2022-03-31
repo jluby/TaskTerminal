@@ -145,7 +145,7 @@ def main():
     )
 
     timed_sleep()
-    lst.main(parse_args=False)
+    lst.main(parse_args=False, stay=True)
 
 
 if __name__ == "__main__":

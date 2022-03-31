@@ -4,6 +4,7 @@
 # base imports
 import argparse
 import json
+import os
 
 import pandas as pd
 
@@ -71,16 +72,15 @@ def main(parse_args=True):
         default=False,
         help="If provided, list only flagged entries.",
     )
-    parser.add_argument(
-        "-arc",
-        action=argparse.BooleanOptionalAction,
-        default=False,
-        help="If provided, show archives.",
-    )
+    last_lst_path = f"{data_path}/last_lst.json"
     if parse_args:
         d = vars(parser.parse_args())
+        json.dump(d, open(last_lst_path, "w"))
     else:
         d = vars(parser.parse_args([]))
+        if os.path.isfile(last_lst_path):
+            last_lst_params = json.load(open(f"{data_path}/last_lst.json", "r"))
+            d.update(last_lst_params)
 
     if d["pos"] and d["ref_proj"] in ["all", "ALL"]:
         raise ValueError(
