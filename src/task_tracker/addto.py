@@ -15,7 +15,6 @@ from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
-    halftab,
     move,
     pkg_path,
     reformat,
@@ -42,7 +41,7 @@ def main():
         "entry_type",
         type=str,
         nargs="?",
-        default="task",
+        default="backburner",
         choices=["task", "ref", "note", "back", "backburner"],
         help="Project list to which entry will be added.",
     )
