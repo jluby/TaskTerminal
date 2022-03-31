@@ -115,12 +115,13 @@ def main(parse_args=True):
     elif d["file"] in ["back", "backburner"]:
         d["file"] = "backburner"
 
+    width = 55
     if d["ref_proj"] in ["all", "ALL"]:
         lines = []
         for proj in project_list:
             df = pd.read_csv(f"{data_path}/projects/{proj}/{d['file']}.csv")
             lines += ["", proj]
-            proj_lines = parse_entries(df, file=d["file"])
+            proj_lines = parse_entries(df, file=d["file"], width=width)
             lines += proj_lines
         lines.append("")
     else:
@@ -128,7 +129,7 @@ def main(parse_args=True):
             f"{data_path}/projects/{d['ref_proj']}/{d['file']}.csv"
         )
         if d["pos"] is None:
-            lines = parse_entries(df, file=d["file"])
+            lines = parse_entries(df, file=d["file"], width=width)
         else:
             idx = define_idx(d["pos"])
             if idx not in list(df.index):
@@ -141,7 +142,7 @@ def main(parse_args=True):
             else:
                 lines = parse_description(df.iloc[idx])
 
-    print_lines(lines)
+    print_lines(lines, width=width)
 
 
 if __name__ == "__main__":

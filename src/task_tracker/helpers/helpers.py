@@ -54,10 +54,10 @@ def timed_sleep():
     time.sleep(1.5)
 
 
-def print_lines(lines: list) -> None:
-    width = np.max([len(line) for line in lines]) + 1
+def print_lines(lines: list, width: int) -> None:
+    print_width = width + 1
     height = len(lines) + 1
-    set_entry_size_manual(height, width)
+    set_entry_size_manual(height, print_width)
     [print(line) for line in lines]
 
 
@@ -94,41 +94,44 @@ def split_to_width(string: str, linelen: int) -> list:
 
 
 def parse_row(
-    string: str, n_tab: int = 0, time_estimate: float = None, entry_width=40) -> None:
+    string: str, linelen: int=40) -> None:
     lines = []
     for l in string.split(sep="|"):
-        newlines = split_to_width(l, linelen=entry_width)
+        newlines = split_to_width(l, linelen=linelen)
         lines += newlines
-    timestamp = f"{time_estimate}hrs" if time_estimate else ""
-    line0 = halftab + lines[0] + halftab + timestamp
-    extra_lines = [halftab + "\t" * n_tab + l for l in lines[1:]]
-    return [line0] + extra_lines
+    return lines
 
 
-def parse_entries(df: pd.DataFrame, file: str) -> None:
+def parse_entries(df: pd.DataFrame, file: str, width: int) -> None:
     """Print all entries in dataframe"""
     lines = []
-    width = 50
+    linelen = width-20
     lines.append("-" * width)
     if len(df) > 0:
         for i, row in enumerate(df.to_dict("records")):
-            entry = (
-                colored(row["entry"], "red", attrs=["bold"])
-                if row["flagged"]
-                else row["entry"]
-            )
             time_estimate = (
                 row["time_estimate"]
                 if file in ["tasks", "backburner"]
                 else None
             )
             rowlines = parse_row(
-                f"{i}\t{entry}", n_tab=1, time_estimate=time_estimate, entry_width=width-17
+                row["entry"], linelen=linelen
             )
-            lines += rowlines
+            rowlines_p = process_rowlines(idx=i, lines=rowlines, time_estimate=time_estimate, linelen=linelen, flagged=row["flagged"])
+            lines += rowlines_p
     lines.append("-" * width)
     return lines
 
+def process_rowlines(idx, lines, time_estimate, linelen, flagged):
+    lines_p = []
+    lines = [colored(l, "red", attrs=["bold"]) if flagged else l for l in lines]
+    if flagged:
+        linelen -= 13
+    estimate_str = f"{time_estimate}hrs" if time_estimate else ""
+    lines_p.append(f"{halftab}{idx}{halftab}{lines[0]: <{linelen}}{halftab}{estimate_str}")
+    for line in lines[1:]:
+        lines_p.append(f"{' '*9}{line: <{linelen}}")
+    return lines_p
 
 def parse_description(df_row: pd.DataFrame) -> list:
     return [""] + parse_row(f"{df_row['description']}") + [""]

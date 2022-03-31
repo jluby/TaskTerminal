@@ -110,15 +110,15 @@ def main():
     to_be_edited.index = [
         f"{c} ({i})" for i, c in enumerate(to_be_edited.index)
     ]
-    set_entry_size(to_be_edited, min_width=49, max_width=74, additional_height=5, additional_width=25)
+    set_entry_size(to_be_edited, min_width=53, max_width=74, additional_height=5, additional_width=25)
     val_idx = int(
         input(
             f"\n{halftab}Which item would you like to edit (enter index)?\n\n{to_be_edited}\n{halftab}"
         )
     )
     edit_lines = split_to_width(str(to_be_edited[val_idx]), linelen=50)
-    set_entry_size_manual(5+len(edit_lines), np.max([len(l) for l in edit_lines])+10)
-    print(f"\n{halftab}The value was:\n\t"); [print(f"{halftab}{l}") for l in edit_lines]; print(f"{halftab}{type(to_be_edited[val_idx])}\n")
+    set_entry_size_manual(6+len(edit_lines), np.max([len(l) for l in edit_lines])+10)
+    print(f"\n{halftab}{to_be_edited.index[val_idx][:-4].capitalize()} was:"); [print(f"{halftab}{l}") for l in edit_lines]; print(f"{halftab}{type(to_be_edited[val_idx])}\n")
     new_value = None
     while type(new_value) != type(to_be_edited[val_idx]):
         with suppress(ValueError):
