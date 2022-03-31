@@ -18,7 +18,7 @@ def set_entry_size_manual(height, width):
     os.system(f"printf '\e[8;{height};{width}t'")
 
 
-def set_entry_size(entry, additional_height=6, additional_width=22, min_width=60, max_width=70):
+def set_entry_size(entry, additional_height=6, additional_width=20, min_width=60, max_width=69):
     print_width = np.max(
         [
             min_width,

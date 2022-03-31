@@ -4,6 +4,7 @@
 # base imports
 import argparse
 import json
+import warnings
 
 import pandas as pd
 
@@ -79,6 +80,15 @@ def main():
                 input_type="error",
             )
         )
+    d["pos"] = [define_idx(i) for i in d["pos"]]
+    if len(set(d["pos"])) != len(d["pos"]):
+        warnings.warn(
+            reformat(
+                f"Dropping duplicate values in {d['pos']}. New indices are {list(set(d['pos']))}",
+                input_type="error",
+            )
+        )
+    d["pos"] = list(set(d["pos"]))
 
     task_path = f"{data_path}/projects/{d['ref_proj']}/tasks.csv"
     back_path = f"{data_path}/projects/{d['ref_proj']}/backburner.csv"
@@ -92,16 +102,16 @@ def main():
         from_name = "tasks"
     from_df = pd.read_csv(from_path)
     to_df = pd.read_csv(to_path)
-    for pos in d['pos']:
-        idx = define_idx(pos)
+    for idx in d['pos']:
         if idx not in list(from_df.index):
             raise ValueError(
                 reformat(
-                    f"Provided index not found in project '{d['ref_proj']}' {from_name}.",
+                    f"Provided index {idx} not found in project '{d['ref_proj']}' {from_name}.",
                     input_type="error",
                 )
             )
-        to_be_moved = from_df.iloc[idx]
+        iloc = from_df.index.get_loc(idx)
+        to_be_moved = from_df.iloc[iloc]
         de = "de" if d["U"] else ""
         q_str = halftab + f"{f'{de}activate'.capitalize()} the below entry? (y/n)"
         set_entry_size(to_be_moved, additional_height=5, min_width=len(q_str)+1)
@@ -111,17 +121,17 @@ def main():
         while confirmed not in ["y", "Y"] + ["n", "N"]:
             confirmed = input(
                 reformat(
-                    f"Accepted inputs are ['y', 'Y', 'n', 'N'.", input_type="input"
+                    f"Accepted inputs are ['y', 'Y', 'n', 'N'].", input_type="input"
                 )
             )
         if confirmed in ["y", "Y"]:
             to_df.loc[len(to_df)] = to_be_moved.tolist()
             to_df.to_csv(to_path, index=False)
-            from_df = from_df.iloc[[i for i in from_df.index if i != idx]]
+            from_df = from_df.loc[from_df.index != idx]
             from_df.to_csv(from_path, index=False)
             print(
                 reformat(
-                    f"{from_name.capitalize()} item {pos} moved successfully."
+                    f"{from_name.capitalize()} item {idx} moved successfully."
                 )
             )
         else:

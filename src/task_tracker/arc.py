@@ -4,6 +4,7 @@
 # base imports
 import argparse
 import json
+import warnings
 from datetime import datetime
 
 import pandas as pd
@@ -81,6 +82,15 @@ def main():
                 input_type="error",
             )
         )
+    if len(set(d["pos"])) != len(d["pos"]):
+        old_pos = d["pos"]
+        d["pos"] = list(dict.fromkeys(d["pos"]))
+        warnings.warn(
+            reformat(
+                f"Dropping duplicate values in {old_pos}. New indices are {list(set(d['pos']))}",
+                input_type="error",
+            )
+        )
 
     task_path = f"{data_path}/projects/{d['ref_proj']}/tasks.csv"
     arc_path = f"{data_path}/projects/{d['ref_proj']}/archives.csv"
@@ -94,8 +104,7 @@ def main():
         from_name = "archives"
     from_df = pd.read_csv(from_path)
     to_df = pd.read_csv(to_path)
-    for pos in d['pos']:
-        idx = define_idx(pos)
+    for idx in [define_idx(i) for i in d["pos"]]:
         if idx not in list(from_df.index):
             raise ValueError(
                 reformat(
@@ -103,10 +112,11 @@ def main():
                     input_type="error",
                 )
             )
-        to_be_moved = from_df.iloc[idx]
+        iloc = from_df.index.get_loc(idx)
+        to_be_moved = from_df.iloc[iloc]
         de = "un" if d["U"] else ""
         q_str = halftab + f"{f'{de}archive'.capitalize()} the below entry? (y/n)"
-        set_entry_size(to_be_moved, additional_height=5, min_width=len(q_str)+1)
+        set_entry_size(to_be_moved, additional_height=5, min_width=len(q_str)+1, additional_width=21 if d['U'] else 20, max_width=70 if d['U'] else 69)
         confirmed = input(
             f"\n{q_str}\n\n{to_be_moved}\n{halftab}"
         )
@@ -127,11 +137,11 @@ def main():
             if from_name == "tasks":
                 to_df = move(to_df, from_index=-1, to_index=0)
             to_df.to_csv(to_path, index=False)
-            from_df = from_df.iloc[[i for i in from_df.index if i != idx]]
+            from_df = from_df.loc[from_df.index != idx]
             from_df.to_csv(from_path, index=False)
             print(
                 reformat(
-                    f"{from_name[:-1].capitalize()} item {pos} moved successfully."
+                    f"{from_name[:-1].capitalize()} item {idx} moved successfully."
                 )
             )
         else:

@@ -4,11 +4,8 @@
 # base imports
 import argparse
 import json
-import os
-import time
-from re import L
+import warnings
 
-import numpy as np
 import pandas as pd
 
 from task_tracker import lst
@@ -44,13 +41,13 @@ def main():
         "entry_type",
         type=str,
         nargs="?",
-        choices=["task", "ref", "note", "archive", "back", "backburner"],
+        choices=["task", "ref", "note", "arc", "archive", "back", "backburner"],
         help="Project list from which entry will be removed.",
     )
     parser.add_argument(
         "pos",
-        nargs="?",
-        help="Position from which to remove task. Accepted arguments are zero / positive integer indices, 'HEAD', and 'TAIL'.",
+        nargs="+",
+        help="Positions from which to remove task. Accepted arguments are zero / positive integer indices, 'HEAD', and 'TAIL'.",
     )
     d = vars(parser.parse_args())
 
@@ -86,7 +83,18 @@ def main():
                 input_type="error",
             )
         )
+    d["pos"] = [define_idx(i) for i in d["pos"]]
+    if len(set(d["pos"])) != len(d["pos"]):
+        warnings.warn(
+            reformat(
+                f"Dropping duplicate values in {d['pos']}. New indices are {list(set(d['pos']))}",
+                input_type="error",
+            )
+        )
+    d["pos"] = list(set(d["pos"]))
 
+    if d["entry_type"] == "arc":
+        d["entry_type"] = "archive"
     if d["entry_type"] not in ["back", "backburner"]:
         filename = d["entry_type"] + "s"
     else:
@@ -96,39 +104,40 @@ def main():
     base_path = f"{data_path}/projects/{d['ref_proj']}"
     path = f"{base_path}/{filename}.csv"
     df = pd.read_csv(path)
-    idx = define_idx(d["pos"])
-    if idx not in list(df.index):
-        raise ValueError(
-            reformat(
-                f"Provided index not found in project '{d['ref_proj']}' file {filename}.",
-                input_type="error",
+    for idx in d["pos"]:
+        if idx not in list(df.index):
+            raise ValueError(
+                reformat(
+                    f"Provided index not found in project '{d['ref_proj']}' file {filename}.",
+                    input_type="error",
+                )
             )
-        )
-    to_be_removed = df.iloc[idx]
-    q_str = halftab + "Remove the below entry? (y/n)"
-    set_entry_size(to_be_removed, min_width=len(q_str)+1)
-    confirmed = input(
-        f"\n{q_str}\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
-    )
-    while confirmed not in ["y", "Y"] + ["n", "N"]:
+        iloc = df.index.get_loc(idx)
+        to_be_removed = df.iloc[iloc]
+        q_str = halftab + "Remove the below entry? (y/n)"
+        set_entry_size(to_be_removed, min_width=len(q_str)+1, additional_width=21 if d["entry_type"]=="archive" else 20, max_width=70 if d["entry_type"]=="archive" else 69)
         confirmed = input(
-            reformat(
-                f"Accepted inputs are ['y', 'Y', 'n', 'N'].",
-                input_type="input",
-            )
+            f"\n{q_str}\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
         )
-    if confirmed in ["y", "Y"]:
-        df = df.iloc[[i for i in df.index if i != idx]]
-        df.to_csv(path, index=False)
-        print(
-            reformat(
-                f"{d['entry_type'].capitalize()} item {d['pos']} removed successfully."
+        while confirmed not in ["y", "Y"] + ["n", "N"]:
+            confirmed = input(
+                reformat(
+                    f"Accepted inputs are ['y', 'Y', 'n', 'N'].",
+                    input_type="input",
+                )
             )
-        )
-    else:
-        print(reformat("Action cancelled."))
+        if confirmed in ["y", "Y"]:
+            df = df.loc[df.index != idx]
+            df.to_csv(path, index=False)
+            print(
+                reformat(
+                    f"{d['entry_type'].capitalize()} item {idx} removed successfully."
+                )
+            )
+        else:
+            print(reformat("Action cancelled."))
+        timed_sleep()
 
-    timed_sleep()
     lst.main(parse_args=False)
 
 
