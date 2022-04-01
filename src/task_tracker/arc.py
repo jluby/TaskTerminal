@@ -129,7 +129,7 @@ def main():
         if confirmed in ["y", "Y"]:
             to_be_moved = to_be_moved.tolist()
             if from_name == "tasks":
-                archive_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                archive_time = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
                 to_be_moved += [archive_time]
             else:
                 to_be_moved = to_be_moved[:-1]

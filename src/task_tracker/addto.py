@@ -108,7 +108,7 @@ def main():
         else f"Paste reference below:"
     )
     description = input(reformat(description_str, input_type="input"))
-    entry_time = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+    entry_time = str(datetime.now().strftime("%m/%d/%Y %H:%M:%S"))
     if entry_name in ["task", "back", "backburner", "schedule"]:
         time_estimate = ""
         while type(time_estimate) is not float:
@@ -134,7 +134,7 @@ def main():
                             )
                         ), "%m/%d/%Y %H:%M"
                     )
-            out_ls.append(scheduled_release)
+            out_ls.append(scheduled_release.strftime("%m/%d/%Y %H:%M:%S"))
     else:
         out_ls = [entry, description, d["flag"], entry_time]
     df.loc[len(df)] = out_ls

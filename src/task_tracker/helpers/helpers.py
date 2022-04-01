@@ -119,7 +119,7 @@ def check_scheduled(project_list = project_list):
         sc_df = pd.read_csv(sc_path)
         back_df = pd.read_csv(back_path)
         for idx, row in enumerate(sc_df.to_dict("records")):
-            release_time = datetime.strptime(row["scheduled_release"], "%Y-%m-%d %H:%M:%S")
+            release_time = datetime.strptime(row["scheduled_release"], "%m/%d/%Y %H:%M:%S")
             # Move if past date
             if release_time < datetime.now():
                 iloc = sc_df.index.get_loc(idx)
@@ -187,7 +187,6 @@ def parse_row(
 def parse_entries(df: pd.DataFrame, file: str, width: int) -> None:
     """Print all entries in dataframe"""
     lines = []
-    linelen = width-20
     lines.append("-" * width)
     if len(df) > 0:
         for i, row in enumerate(df.to_dict("records")):
@@ -196,39 +195,38 @@ def parse_entries(df: pd.DataFrame, file: str, width: int) -> None:
                 if file in ["tasks", "backburner"]
                 else None
             )
-            if file == "scheduled":
-                scheduled_release = row["scheduled_release"]
-                linelen = width - 22
-            else:
-                scheduled_release = None
+            scheduled_release = row["scheduled_release"] if file == "scheduled" else None
+            datetime_archived = row["datetime_archived"] if file == "archives" else None
+            linelen = width - 23 if file in ["scheduled", "archives"] else width - 20
             rowlines = parse_row(
                 row["entry"], linelen=linelen
             )
-            rowlines_p = process_rowlines(idx=i, lines=rowlines, time_estimate=time_estimate, linelen=linelen, flagged=row["flagged"], scheduled_release=scheduled_release)
+            rowlines_p = process_rowlines(idx=i, lines=rowlines, time_estimate=time_estimate, linelen=linelen, flagged=row["flagged"], scheduled_release=scheduled_release, datetime_archived=datetime_archived)
             lines += rowlines_p
     lines.append("-" * width)
     return lines
 
-def process_rowlines(idx, lines, time_estimate, linelen, flagged, scheduled_release):
+def process_rowlines(idx, lines, time_estimate, linelen, flagged, scheduled_release, datetime_archived):
     lines_p = []
     lines = [colored(l, "red", attrs=["bold"]) if flagged else l for l in lines]
     if flagged:
         linelen -= 13
-    if time_estimate:
-        estimate_str = f"{time_estimate}hrs" if type(time_estimate) is float else ""
-        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{estimate_str}")
+    if type(time_estimate) is float:
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{time_estimate}hrs")
     elif scheduled_release:
-        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_release_str(scheduled_release)}")
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab} {process_date_str(scheduled_release): >{9}}")
+    elif datetime_archived:
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(datetime_archived): >{9}}")
     else:
-        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}")
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}")
 
     for line in lines[1:]:
         lines_p.append(f"{' '*9}{line: <{linelen}}")
     return lines_p
 
-def process_release_str(scheduled_release: str) -> str:
-    s = scheduled_release[:10]
-    return f"{s[5:7]}/{s[8:]}/{s[2:4]}"
+def process_date_str(date_str: str) -> str:
+    s = f" {date_str[:10]}".replace(" 0", " ").replace("/0", "/")
+    return s
 
 def parse_description(df_row: pd.DataFrame) -> list:
     return [""] + parse_row(f"{df_row['description']}") + [""]

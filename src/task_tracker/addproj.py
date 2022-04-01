@@ -42,6 +42,7 @@ def main():
         )
 
     base_path = f"{data_path}/projects/{d['project']}"
+
     os.makedirs(base_path)
     for file in ["tasks", "refs", "notes", "backburner", "scheduled", "archives"]:
         if file in ["tasks", "backburner", "scheduled"]:
