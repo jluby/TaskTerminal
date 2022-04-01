@@ -29,24 +29,27 @@ from .helpers.helpers import (
 )
 
 # TODO: allow for day of the week entries
-def reformat_date(date_str: str):
+def reformat_date(date_and_time: str):
+    if " " in date_and_time:
+        date_str, time_str = date_and_time.split(" ")
+    else:
+        date_str, time_str = date_and_time, "00:00"
     if date_str.count("/") == 0:
         day = time.strptime(date_str, "%a").tm_wday
         today = dt.today()
-        remainder = (day-today.weekday()) % 7 if day-today.weekday() != 0 else 7
-        date = today + timedelta(remainder)
+        remainder = (day-today.weekday()-1) % 7 + 1
+        date = today + timedelta(days=remainder)
     else:
-        if date_str.count("/") == 1:
-            p = [v.zfill(2) for v in parse("{}/{}", date_str)]
-            date = datetime.strptime(f"{p[0]}/{p[1]}", "%m/%d")
-        else:
-            p = [v.zfill(2) for v in parse("{}/{}/{} {}:{}", date_str)]
-            date = datetime.strptime(f"{p[0]}/{p[1]} {p[2]}:{p[3]}", "%m/%d %H:%M")
+        p = [v.zfill(2) for v in parse("{}/{}", date_str)]
+        date = datetime.strptime(f"{p[0]}/{p[1]}", "%m/%d")
         date += relativedelta(years=datetime.now().year - date.year)
         if datetime.now() > date:
             date += relativedelta(years=1)
     
-    return date
+    p = [v.zfill(2) for v in parse("{}:{}", time_str)]
+    tm = datetime.strptime(f"{p[0]}:{p[1]}", "%H:%M").time()
+    
+    return datetime.combine(date, tm)
 
 def main():
     check_init()
