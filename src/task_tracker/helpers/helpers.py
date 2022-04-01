@@ -63,46 +63,55 @@ def print_lines(lines: list, width: int, extra_height=1) -> None:
 file_options = [
     "notes",
     "note",
+    "n",
     "tasks",
     "task",
+    "t",
     "refs",
     "ref",
+    "r",
     "arc",
+    "a",
     "archive",
     "archives",
     "back",
     "backburner",
+    "b",
     "schedule",
     "scheduled",
     "sc",
     "sd",
     "scd",
+    "s"
 ]
 
 def process_file(file: str):
+    real_files = ["tasks", "archives", "notes", "scheduled", "backburner"]
 
     if file in ["task", "ref", "note", "archive"]:
         file_name = file + "s"
     elif file == "back":
         file_name = "backburner"
-    elif file in ["sc", "sd", "scd", "schedule"]:
+    elif file == "schedule":
         file_name = "scheduled"
-    elif file == "arc":
-        file_name = "archives"
+    elif len(file) == 1:
+        file_name = [f for f in real_files if f[0] == file][0]
     else:
         file_name = file
     
     return file_name
 
 def process_name(file: str):
+    names = ["task", "archive", "note", "schedule", "backburner"]
+
     if file in ["tasks", "refs", "notes", "archives", "scheduled"]:
         name = file[:-1]
-    elif file in ["sc", "sd", "scd"]:
-        name = "schedule"
     elif file == "back":
         name = "backburner"
     elif file == "arc":
         name = "archives"
+    elif len(file) == 1:
+        name = [n for n in names if n[0] == file][0]
     else:
         name = file
     
@@ -153,8 +162,6 @@ def check_init() -> None:
         json.dump([], open(f"{data_path}/project_list.json", "w"))
         json.dump([], open(f"{data_path}/hidden_project_list.json", "w"))
         os.makedirs(f"{data_path}/projects")
-
-    check_scheduled()
 
 
 def split_to_width(string: str, linelen: int) -> list:

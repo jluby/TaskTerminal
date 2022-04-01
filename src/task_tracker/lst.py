@@ -19,7 +19,7 @@ from .helpers.helpers import (
     reformat,
     file_options,
     process_file,
-    get_bonus_width
+    check_scheduled
 )
 
 # establish parameters
@@ -31,6 +31,7 @@ project_list = [p for p in project_list if p not in hidden_list]
 
 def main(parse_args=True):
     check_init()
+    check_scheduled()
 
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(description="Input project to view.")
@@ -102,7 +103,6 @@ def main(parse_args=True):
         )
 
     file_name = process_file(d["file"])
-    bonus_width = get_bonus_width(file_name)
 
     width = 55
     if d["ref_proj"] in ["all", "ALL"]:
