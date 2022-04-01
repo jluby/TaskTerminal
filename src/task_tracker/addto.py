@@ -28,26 +28,32 @@ from .helpers.helpers import (
     process_name
 )
 
-# TODO: allow for day of the week entries
+# TODO: allow 'sc' as schedule entry
+
 def reformat_date(date_and_time: str):
     if " " in date_and_time:
         date_str, time_str = date_and_time.split(" ")
-    else:
+    elif ":" not in date_and_time:
         date_str, time_str = date_and_time, "00:00"
-    if date_str.count("/") == 0:
-        day = time.strptime(date_str, "%a").tm_wday
-        today = dt.today()
-        remainder = (day-today.weekday()-1) % 7 + 1
-        date = today + timedelta(days=remainder)
     else:
-        p = [v.zfill(2) for v in parse("{}/{}", date_str)]
-        date = datetime.strptime(f"{p[0]}/{p[1]}", "%m/%d")
-        date += relativedelta(years=datetime.now().year - date.year)
-        if datetime.now() > date:
-            date += relativedelta(years=1)
+        date, time_str = dt.today(), date_and_time
+        date_str = None
     
-    p = [v.zfill(2) for v in parse("{}:{}", time_str)]
-    tm = datetime.strptime(f"{p[0]}:{p[1]}", "%H:%M").time()
+    if date_str:
+        if date_str.count("/") == 0:
+            today = dt.today()
+            day = time.strptime(date_str, "%a").tm_wday
+            remainder = (day-today.weekday()-1) % 7 + 1
+            date = today + timedelta(days=remainder)
+        else:
+            p = [v.zfill(2) for v in parse("{}/{}", date_str)]
+            date = datetime.strptime(f"{p[0]}/{p[1]}", "%m/%d")
+            date += relativedelta(years=datetime.now().year - date.year)
+            if datetime.now() > date:
+                date += relativedelta(years=1)
+    
+    p = [v.zfill(2) for v in parse("{}:{}", time_str[:-2])]
+    tm = datetime.strptime(f"{p[0]}:{p[1]}{time_str[-2:]}", "%I:%M%p").time()
     
     return datetime.combine(date, tm)
 

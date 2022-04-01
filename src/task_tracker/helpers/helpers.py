@@ -73,7 +73,10 @@ file_options = [
     "back",
     "backburner",
     "schedule",
-    "scheduled"
+    "scheduled",
+    "sc",
+    "sd",
+    "scd",
 ]
 
 def process_file(file: str):
@@ -82,7 +85,7 @@ def process_file(file: str):
         file_name = file + "s"
     elif file == "back":
         file_name = "backburner"
-    elif file == "schedule":
+    elif file in ["sc", "sd", "scd", "schedule"]:
         file_name = "scheduled"
     elif file == "arc":
         file_name = "archives"
@@ -94,6 +97,8 @@ def process_file(file: str):
 def process_name(file: str):
     if file in ["tasks", "refs", "notes", "archives", "scheduled"]:
         name = file[:-1]
+    elif file in ["sc", "sd", "scd"]:
+        name = "schedule"
     elif file == "back":
         name = "backburner"
     elif file == "arc":
