@@ -17,6 +17,9 @@ from .helpers.helpers import (
     pkg_path,
     print_lines,
     reformat,
+    file_options,
+    process_file,
+    get_bonus_width
 )
 
 # establish parameters
@@ -24,19 +27,6 @@ templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 hidden_list = json.load(open(f"{data_path}/hidden_project_list.json", "r"))
 project_list = [p for p in project_list if p not in hidden_list]
-lists = [
-    "notes",
-    "note",
-    "tasks",
-    "task",
-    "refs",
-    "ref",
-    "archive",
-    "archives",
-    "arc",
-    "back",
-    "backburner",
-]
 
 
 def main(parse_args=True):
@@ -57,7 +47,7 @@ def main(parse_args=True):
         type=str,
         nargs="?",
         default="tasks",
-        choices=lists,
+        choices=file_options,
         help="List to display within project.",
     )
     parser.add_argument(
@@ -111,41 +101,42 @@ def main(parse_args=True):
             )
         )
 
-    if d["file"] == "arc":
-        d["file"] = "archives"
-    elif d["file"][-1] != "s" and d["file"] not in ["back", "backburner"]:
-        d["file"] += "s"
-    elif d["file"] in ["back", "backburner"]:
-        d["file"] = "backburner"
+    file_name = process_file(d["file"])
+    bonus_width = get_bonus_width(file_name)
 
     width = 55
     if d["ref_proj"] in ["all", "ALL"]:
         lines = []
         for proj in project_list:
-            df = pd.read_csv(f"{data_path}/projects/{proj}/{d['file']}.csv")
+            df = pd.read_csv(f"{data_path}/projects/{proj}/{file_name}.csv")
             lines += ["", proj]
-            proj_lines = parse_entries(df, file=d["file"], width=width)
+            proj_lines = parse_entries(df, file=file_name, width=width)
             lines += proj_lines
         lines.append("")
     else:
         df = pd.read_csv(
-            f"{data_path}/projects/{d['ref_proj']}/{d['file']}.csv"
+            f"{data_path}/projects/{d['ref_proj']}/{file_name}.csv"
         )
         if d["pos"] is None:
-            lines = parse_entries(df, file=d["file"], width=width)
+            lines = parse_entries(df, file=file_name, width=width)
         else:
             idx = define_idx(d["pos"])
             if idx not in list(df.index):
                 raise ValueError(
                     reformat(
-                        f"Provided index not found in project '{d['ref_proj']}' file '{d['file']}'. To view file contents, run {templates['list_proj_and_type']}.",
+                        f"Provided index not found in project '{d['ref_proj']}' file '{file_name}'. To view file contents, run {templates['list_proj_and_type']}.",
                         input_type="error",
                     )
                 )
             else:
                 lines = parse_description(df.iloc[idx])
 
-    print_lines(lines, width=width)
+    if not d["pos"]:
+        print(f"\n---{file_name.upper()}---")
+        extra_height = 2
+    else:
+        extra_height = 1
+    print_lines(lines, width=width, extra_height=extra_height)
 
 
 if __name__ == "__main__":

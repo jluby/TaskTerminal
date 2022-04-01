@@ -7,9 +7,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from termcolor import colored
+from datetime import datetime
 
 pkg_path = Path(__file__).parents[1]
 data_path = f"{pkg_path}/.package_data"
+project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 
 halftab = " " * 4
 
@@ -52,12 +54,92 @@ def timed_sleep(t=1):
     time.sleep(t)
 
 
-def print_lines(lines: list, width: int) -> None:
+def print_lines(lines: list, width: int, extra_height=1) -> None:
     print_width = width + 1
-    height = len(lines) + 1
+    height = len(lines) + extra_height
     set_entry_size_manual(height, print_width)
     [print(line) for line in lines]
 
+file_options = [
+    "notes",
+    "note",
+    "tasks",
+    "task",
+    "refs",
+    "ref",
+    "arc",
+    "archive",
+    "archives",
+    "back",
+    "backburner",
+    "schedule",
+    "scheduled"
+]
+
+def process_file(file: str):
+
+    if file in ["task", "ref", "note", "archive"]:
+        file_name = file + "s"
+    elif file == "back":
+        file_name = "backburner"
+    elif file == "schedule":
+        file_name = "scheduled"
+    elif file == "arc":
+        file_name = "archives"
+    else:
+        file_name = file
+    
+    return file_name
+
+def process_name(file: str):
+    if file in ["tasks", "refs", "notes", "archives", "scheduled"]:
+        name = file[:-1]
+    elif file == "back":
+        name = "backburner"
+    elif file == "arc":
+        name = "archives"
+    else:
+        name = file
+    
+    return name
+
+def get_bonus_width(file_name: str):
+    if file_name in ["archives", "scheduled"]:
+        bonus_width = 1
+    else:
+        bonus_width = 0
+
+    return bonus_width
+
+def check_scheduled(project_list = project_list):
+    moves = {k:0 for k in project_list}
+    for project in project_list:
+        sc_path = f"{data_path}/projects/{project}/scheduled.csv"
+        back_path = f"{data_path}/projects/{project}/backburner.csv"
+        sc_df = pd.read_csv(sc_path)
+        back_df = pd.read_csv(back_path)
+        for idx, row in enumerate(sc_df.to_dict("records")):
+            release_time = datetime.strptime(row["scheduled_release"], "%Y-%m-%d %H:%M:%S")
+            # Move if past date
+            if release_time < datetime.now():
+                iloc = sc_df.index.get_loc(idx)
+                to_be_moved = sc_df.iloc[iloc]
+                back_df.loc[len(back_df)] = to_be_moved.tolist()[:-1] # drop release time
+                back_df.to_csv(back_path, index=False)
+                sc_df = sc_df.loc[sc_df.index != idx]
+                sc_df.to_csv(sc_path, index=False)
+                moves[project] += 1
+    
+    k_w_moves = sum([v > 0 for v in moves.values()])
+    if k_w_moves:
+        print("")
+        for k,v in moves.items():
+            if v > 0:
+                p = "s" if v > 1 else ""
+                print(f"{halftab}({v}) item{p} from {k} activated from schedule.")
+        print("")
+        set_entry_size_manual(height=k_w_moves+3, width=51)
+        
 
 def check_init() -> None:
     if not os.path.isdir(data_path):
@@ -65,6 +147,8 @@ def check_init() -> None:
         json.dump([], open(f"{data_path}/project_list.json", "w"))
         json.dump([], open(f"{data_path}/hidden_project_list.json", "w"))
         os.makedirs(f"{data_path}/projects")
+
+    check_scheduled()
 
 
 def split_to_width(string: str, linelen: int) -> list:
@@ -92,7 +176,7 @@ def split_to_width(string: str, linelen: int) -> list:
 
 
 def parse_row(
-    string: str, linelen: int=40) -> None:
+    string: str, linelen: int=40) -> list:
     lines = []
     for l in string.split(sep="|"):
         newlines = split_to_width(l, linelen=linelen)
@@ -112,24 +196,39 @@ def parse_entries(df: pd.DataFrame, file: str, width: int) -> None:
                 if file in ["tasks", "backburner"]
                 else None
             )
+            if file == "scheduled":
+                scheduled_release = row["scheduled_release"]
+                linelen = width - 22
+            else:
+                scheduled_release = None
             rowlines = parse_row(
                 row["entry"], linelen=linelen
             )
-            rowlines_p = process_rowlines(idx=i, lines=rowlines, time_estimate=time_estimate, linelen=linelen, flagged=row["flagged"])
+            rowlines_p = process_rowlines(idx=i, lines=rowlines, time_estimate=time_estimate, linelen=linelen, flagged=row["flagged"], scheduled_release=scheduled_release)
             lines += rowlines_p
     lines.append("-" * width)
     return lines
 
-def process_rowlines(idx, lines, time_estimate, linelen, flagged):
+def process_rowlines(idx, lines, time_estimate, linelen, flagged, scheduled_release):
     lines_p = []
     lines = [colored(l, "red", attrs=["bold"]) if flagged else l for l in lines]
     if flagged:
         linelen -= 13
-    estimate_str = f"{time_estimate}hrs" if time_estimate else ""
-    lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{estimate_str}")
+    if time_estimate:
+        estimate_str = f"{time_estimate}hrs" if type(time_estimate) is float else ""
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{estimate_str}")
+    elif scheduled_release:
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_release_str(scheduled_release)}")
+    else:
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}")
+
     for line in lines[1:]:
         lines_p.append(f"{' '*9}{line: <{linelen}}")
     return lines_p
+
+def process_release_str(scheduled_release: str) -> str:
+    s = scheduled_release[:10]
+    return f"{s[5:7]}/{s[8:]}/{s[2:4]}"
 
 def parse_description(df_row: pd.DataFrame) -> list:
     return [""] + parse_row(f"{df_row['description']}") + [""]

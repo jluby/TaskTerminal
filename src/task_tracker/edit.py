@@ -23,7 +23,10 @@ from .helpers.helpers import (
     set_entry_size,
     timed_sleep,
     split_to_width,
-    set_entry_size_manual
+    set_entry_size_manual,
+    file_options,
+    process_file,
+    get_bonus_width
 )
 
 # establish parameters
@@ -46,7 +49,7 @@ def main():
         "entry_type",
         type=str,
         nargs="?",
-        choices=["task", "ref", "note", "archive", "back", "backburner"],
+        choices=file_options,
         help="Project list from which entry will be removed.",
     )
     parser.add_argument(
@@ -89,11 +92,8 @@ def main():
             )
         )
 
-    if d["entry_type"] not in ["back", "backburner"]:
-        file_name = d["entry_type"] + "s"
-    else:
-        file_name = "backburner"
-        d["entry_type"] = "backburner"
+    file_name = process_file(d["entry_type"])
+    bonus_width = get_bonus_width(file_name)
 
     base_path = f"{data_path}/projects/{d['ref_proj']}"
     path = f"{base_path}/{file_name}.csv"
@@ -110,7 +110,7 @@ def main():
     to_be_edited.index = [
         f"{c} ({i})" for i, c in enumerate(to_be_edited.index)
     ]
-    set_entry_size(to_be_edited, min_width=53, max_width=74, additional_height=5, additional_width=25)
+    set_entry_size(to_be_edited, min_width=53, max_width=74 + bonus_width, additional_height=5, additional_width=25 + bonus_width)
     val_idx = int(
         input(
             f"\n{halftab}Which item would you like to edit (enter index)?\n\n{to_be_edited}\n{halftab}"

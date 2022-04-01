@@ -19,6 +19,9 @@ from .helpers.helpers import (
     pkg_path,
     reformat,
     timed_sleep,
+    file_options,
+    process_file,
+    process_name
 )
 
 
@@ -42,7 +45,7 @@ def main():
         type=str,
         nargs="?",
         default="backburner",
-        choices=["task", "ref", "note", "back", "backburner"],
+        choices=file_options,
         help="Project list to which entry will be added.",
     )
     parser.add_argument(
@@ -85,31 +88,28 @@ def main():
             )
         )
 
-    if d["entry_type"] not in ["back", "backburner"]:
-        file_name = d["entry_type"] + "s"
-    else:
-        file_name = "backburner"
-        d["entry_type"] = "backburner"
+    file_name = process_file(d["entry_type"])
+    entry_name = process_name(d["entry_type"])
 
     path = f"{data_path}/projects/{d['ref_proj']}/{file_name}.csv"
     df = pd.read_csv(path)
     entry = ""
     description = ""
     entry_str = (
-        f"Provide {d['entry_type']}:"
-        if d["entry_type"] != "ref"
-        else f"Provide {d['entry_type']} description:"
+        f"Provide {entry_name} entry:"
+        if entry_name != "ref"
+        else f"Provide {entry_name} description:"
     )
     while entry == "":
         entry = input(reformat(entry_str, input_type="input"))
     description_str = (
-        f"Describe {d['entry_type']}:"
-        if d["entry_type"] != "ref"
+        f"Describe {entry_name} entry:"
+        if entry_name != "ref"
         else f"Paste reference below:"
     )
     description = input(reformat(description_str, input_type="input"))
-    entry_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    if d["entry_type"] in ["task", "back", "backburner"]:
+    entry_time = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+    if entry_name in ["task", "back", "backburner", "schedule"]:
         time_estimate = ""
         while type(time_estimate) is not float:
             with suppress(ValueError):
@@ -121,25 +121,29 @@ def main():
                         )
                     )
                 )
-        df.loc[len(df)] = [
-            entry,
-            description,
-            time_estimate,
-            d["flag"],
-            entry_time,
-        ]
+        out_ls = [entry, description, time_estimate, d["flag"], entry_time]
+        if entry_name == "schedule":
+            scheduled_release = ""
+            while type(scheduled_release) is not datetime or not scheduled_release > datetime.now():
+                with suppress(ValueError):
+                    scheduled_release = datetime.strptime(
+                        input(
+                            reformat(
+                                "When should this be released? (%m/%d/%Y %H:%M)",
+                                input_type="input",
+                            )
+                        ), "%m/%d/%Y %H:%M"
+                    )
+            out_ls.append(scheduled_release)
     else:
-        df.loc[len(df)] = [
-            entry,
-            description,
-            d["flag"],
-            entry_time,
-        ]
+        out_ls = [entry, description, d["flag"], entry_time]
+    df.loc[len(df)] = out_ls
     df = move(df, from_index=-1, to_index=define_idx(d["pos"]))
     df.to_csv(path, index=False)
+    df = pd.read_csv(path)
     print(
         reformat(
-            f"{d['entry_type'].capitalize()} added successfully.",
+            f"{entry_name.capitalize()} added successfully.",
             input_type=None,
         )
     )
@@ -150,3 +154,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# TODO: fix sizing on schedule rm / edit / whatever

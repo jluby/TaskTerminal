@@ -14,11 +14,14 @@ from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
+    get_bonus_width,
     halftab,
     pkg_path,
     reformat,
     set_entry_size,
     timed_sleep,
+    file_options,
+    process_file
 )
 
 # establish parameters
@@ -41,7 +44,7 @@ def main():
         "entry_type",
         type=str,
         nargs="?",
-        choices=["task", "ref", "note", "arc", "archive", "back", "backburner"],
+        choices=file_options,
         help="Project list from which entry will be removed.",
     )
     parser.add_argument(
@@ -93,29 +96,24 @@ def main():
         )
     d["pos"] = list(set(d["pos"]))
 
-    if d["entry_type"] == "arc":
-        d["entry_type"] = "archive"
-    if d["entry_type"] not in ["back", "backburner"]:
-        filename = d["entry_type"] + "s"
-    else:
-        filename = "backburner"
-        d["entry_type"] = "backburner"
+    file_name = process_file(d["entry_type"])
+    bonus_width = get_bonus_width(file_name)
 
     base_path = f"{data_path}/projects/{d['ref_proj']}"
-    path = f"{base_path}/{filename}.csv"
+    path = f"{base_path}/{file_name}.csv"
     df = pd.read_csv(path)
     for idx in d["pos"]:
         if idx not in list(df.index):
             raise ValueError(
                 reformat(
-                    f"Provided index not found in project '{d['ref_proj']}' file {filename}.",
+                    f"Provided index not found in project '{d['ref_proj']}' file {file_name}.",
                     input_type="error",
                 )
             )
         iloc = df.index.get_loc(idx)
         to_be_removed = df.iloc[iloc]
         q_str = halftab + "Remove the below entry? (y/n)"
-        set_entry_size(to_be_removed, min_width=len(q_str)+1, additional_width=21 if d["entry_type"]=="archive" else 20, max_width=70 if d["entry_type"]=="archive" else 69)
+        set_entry_size(to_be_removed, min_width=len(q_str)+1, additional_width=21+bonus_width, max_width=70+bonus_width)
         confirmed = input(
             f"\n{q_str}\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
         )
