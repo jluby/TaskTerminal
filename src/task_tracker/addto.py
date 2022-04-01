@@ -5,7 +5,11 @@
 import argparse
 import json
 from contextlib import suppress
-from datetime import datetime
+from datetime import datetime, timedelta
+from datetime import date as dt
+from dateutil.relativedelta import relativedelta
+from parse import *
+import time
 
 import pandas as pd
 
@@ -24,6 +28,25 @@ from .helpers.helpers import (
     process_name
 )
 
+# TODO: allow for day of the week entries
+def reformat_date(date_str: str):
+    if date_str.count("/") == 0:
+        day = time.strptime(date_str, "%a").tm_wday
+        today = dt.today()
+        remainder = (day-today.weekday()) % 7 if day-today.weekday() != 0 else 7
+        date = today + timedelta(remainder)
+    else:
+        if date_str.count("/") == 1:
+            p = [v.zfill(2) for v in parse("{}/{}", date_str)]
+            date = datetime.strptime(f"{p[0]}/{p[1]}", "%m/%d")
+        else:
+            p = [v.zfill(2) for v in parse("{}/{}/{} {}:{}", date_str)]
+            date = datetime.strptime(f"{p[0]}/{p[1]} {p[2]}:{p[3]}", "%m/%d %H:%M")
+        date += relativedelta(years=datetime.now().year - date.year)
+        if datetime.now() > date:
+            date += relativedelta(years=1)
+    
+    return date
 
 def main():
     check_init()
@@ -123,18 +146,17 @@ def main():
                 )
         out_ls = [entry, description, time_estimate, d["flag"], entry_time]
         if entry_name == "schedule":
-            scheduled_release = ""
-            while type(scheduled_release) is not datetime or not scheduled_release > datetime.now():
-                with suppress(ValueError):
-                    scheduled_release = datetime.strptime(
-                        input(
-                            reformat(
-                                "When should this be released? (%m/%d/%Y %H:%M)",
-                                input_type="input",
-                            )
-                        ), "%m/%d/%Y %H:%M"
-                    )
-            out_ls.append(scheduled_release.strftime("%m/%d/%Y %H:%M:%S"))
+            release = ""
+            while type(release) is not datetime or not release > datetime.now():
+                #with suppress(ValueError):
+                release = input(
+                    reformat(
+                        "When should this be released? (%-m/%-d %H:%M)",
+                        input_type="input",
+                        )
+                )
+                release = reformat_date(release)
+            out_ls.append(release.strftime("%m/%d/%Y %H:%M:%S"))
     else:
         out_ls = [entry, description, d["flag"], entry_time]
     df.loc[len(df)] = out_ls

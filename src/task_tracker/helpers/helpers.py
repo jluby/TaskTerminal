@@ -139,6 +139,7 @@ def check_scheduled(project_list = project_list):
                 print(f"{halftab}({v}) item{p} from {k} activated from schedule.")
         print("")
         set_entry_size_manual(height=k_w_moves+3, width=51)
+        timed_sleep()
         
 
 def check_init() -> None:
@@ -190,33 +191,31 @@ def parse_entries(df: pd.DataFrame, file: str, width: int) -> None:
     lines.append("-" * width)
     if len(df) > 0:
         for i, row in enumerate(df.to_dict("records")):
-            time_estimate = (
-                row["time_estimate"]
-                if file in ["tasks", "backburner"]
-                else None
-            )
-            scheduled_release = row["scheduled_release"] if file == "scheduled" else None
-            datetime_archived = row["datetime_archived"] if file == "archives" else None
-            linelen = width - 23 if file in ["scheduled", "archives"] else width - 20
-            rowlines = parse_row(
-                row["entry"], linelen=linelen
-            )
-            rowlines_p = process_rowlines(idx=i, lines=rowlines, time_estimate=time_estimate, linelen=linelen, flagged=row["flagged"], scheduled_release=scheduled_release, datetime_archived=datetime_archived)
+            rowlines_p = process_rowlines(idx=i, row=row, width=width, file=file)
             lines += rowlines_p
     lines.append("-" * width)
     return lines
 
-def process_rowlines(idx, lines, time_estimate, linelen, flagged, scheduled_release, datetime_archived):
+def process_rowlines(idx, row, width, file):
+    for key in ["flagged", "time_estimate", "scheduled_release" ,"datetime_archived"]:
+        if key not in row:
+            row[key] = None
+
+    linelen = width - 23 if file in ["scheduled", "archives"] else width - 20
+    lines = parse_row(
+        row["entry"], linelen=linelen
+    )
+    
     lines_p = []
-    lines = [colored(l, "red", attrs=["bold"]) if flagged else l for l in lines]
-    if flagged:
+    lines = [colored(l, "red", attrs=["bold"]) if row["flagged"] else l for l in lines]
+    if row["flagged"]:
         linelen -= 13
-    if type(time_estimate) is float:
-        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{time_estimate}hrs")
-    elif scheduled_release:
-        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(scheduled_release): >{10}}")
-    elif datetime_archived:
-        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(datetime_archived): >{10}}")
+    if type(row["time_estimate"]) is float and not (row["scheduled_release"] or row["datetime_archived"]):
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{row['time_estimate']}hrs")
+    elif row["scheduled_release"]:
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(row['scheduled_release']): >{10}}")
+    elif row["datetime_archived"]:
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(row['datetime_archived']): >{10}}")
     else:
         lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}")
 
