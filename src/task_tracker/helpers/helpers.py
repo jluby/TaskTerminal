@@ -214,9 +214,9 @@ def process_rowlines(idx, lines, time_estimate, linelen, flagged, scheduled_rele
     if type(time_estimate) is float:
         lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{time_estimate}hrs")
     elif scheduled_release:
-        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab} {process_date_str(scheduled_release): >{9}}")
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(scheduled_release): >{10}}")
     elif datetime_archived:
-        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(datetime_archived): >{9}}")
+        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(datetime_archived): >{10}}")
     else:
         lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}")
 
@@ -226,6 +226,7 @@ def process_rowlines(idx, lines, time_estimate, linelen, flagged, scheduled_rele
 
 def process_date_str(date_str: str) -> str:
     s = f" {date_str[:10]}".replace(" 0", " ").replace("/0", "/")
+    print(s, len(s))
     return s
 
 def parse_description(df_row: pd.DataFrame) -> list:
