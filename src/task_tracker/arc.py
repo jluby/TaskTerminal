@@ -143,7 +143,7 @@ def main():
             if not d["U"]:
                 print(
                     reformat(
-                        colored("Nice job! \u263A", color="green")
+                        colored("-- \u263A Nice job! \u263A --", color="green", attrs=["bold", "blink"])
                     )
                 )
                 timed_sleep(2)
