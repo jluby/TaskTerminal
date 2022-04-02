@@ -86,7 +86,7 @@ file_options = [
 ]
 
 def process_file(file: str):
-    real_files = ["tasks", "archives", "notes", "scheduled", "backburner"]
+    real_files = ["tasks", "archives", "notes", "refs", "scheduled", "backburner"]
 
     if file in ["task", "ref", "note", "archive"]:
         file_name = file + "s"
@@ -153,7 +153,7 @@ def check_scheduled(project_list = project_list):
                 print(f"{halftab}({v}) item{p} from {k} activated from schedule.")
         print("")
         set_entry_size_manual(height=k_w_moves+3, width=51)
-        timed_sleep()
+        timed_sleep(1.5)
         
 
 def check_init() -> None:
@@ -197,16 +197,42 @@ def parse_row(
     return lines
 
 
-def parse_entries(df: pd.DataFrame, file: str, width: int) -> None:
+def parse_entries(df: pd.DataFrame, project: str, file: str, width: int) -> None:
     """Print all entries in dataframe"""
     lines = []
+    lines += ["", project]
     lines.append("-" * width)
     if len(df) > 0:
         for i, row in enumerate(df.to_dict("records")):
             rowlines_p = process_rowlines(idx=i, row=row, width=width, file=file)
             lines += rowlines_p
     lines.append("-" * width)
+
+    if file in ["tasks", "backburner"]:
+        header_stats, hour_sum = get_project_stats(project, file)
+        if hour_sum:
+            hour_str = str(hour_sum) + 'hrs'; t_str = "T: "
+        else:
+            hour_str = ""; t_str = ""
+        lines.append(f"{header_stats: <{30}}{t_str: >{width-37}}{hour_str: <{7}}")
+    else:
+        lines.append("")
+    
     return lines
+
+def get_project_stats(project, file):
+    last = {"backburner": "scheduled", "tasks": "backburner"}
+    last_df = pd.read_csv(f"{data_path}/projects/{project}/{last[file]}.csv")
+    n_tasks = len(last_df)
+    l_hours = sum(last_df["time_estimate"])
+    header = f"<- {n_tasks}"
+    if file != "backburner":
+        header += f" | {l_hours}"
+
+    current_df = pd.read_csv(f"{data_path}/projects/{project}/{file}.csv")
+    p_hours = sum(current_df["time_estimate"]) if len(current_df) > 1 else None
+    
+    return header, p_hours
 
 def process_rowlines(idx, row, width, file):
     for key in ["flagged", "time_estimate", "scheduled_release" ,"datetime_archived"]:

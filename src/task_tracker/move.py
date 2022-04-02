@@ -3,8 +3,6 @@
 
 import argparse
 import json
-from pathlib import Path
-
 import pandas as pd
 
 from task_tracker import lst
@@ -13,11 +11,12 @@ from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
-    halftab,
     move,
     pkg_path,
     reformat,
     timed_sleep,
+    file_options,
+    process_file
 )
 
 # establish parameters
@@ -40,7 +39,7 @@ def main():
         "entry_type",
         type=str,
         nargs="?",
-        choices=["task", "ref", "note", "back", "backburner", "archive"],
+        choices=file_options,
         help="List in which entry will be moved.",
     )
     parser.add_argument(
@@ -92,11 +91,7 @@ def main():
             )
         )
 
-    if d["entry_type"] not in ["back", "backburner"]:
-        file = d["entry_type"] + "s"
-    else:
-        file = "backburner"
-        d["entry_type"] = "backburner"
+    file = process_file(d["entry_type"])
 
     from_idx = define_idx(d["from"])
     to_idx = define_idx(d["to"])

@@ -109,16 +109,15 @@ def main(parse_args=True):
         lines = []
         for proj in project_list:
             df = pd.read_csv(f"{data_path}/projects/{proj}/{file_name}.csv")
-            lines += ["", proj]
-            proj_lines = parse_entries(df, file=file_name, width=width)
+            proj_lines = parse_entries(df, project=proj, file=file_name, width=width)
             lines += proj_lines
-        lines.append("")
+        lines += [""]
     else:
         df = pd.read_csv(
             f"{data_path}/projects/{d['ref_proj']}/{file_name}.csv"
         )
         if d["pos"] is None:
-            lines = parse_entries(df, file=file_name, width=width)
+            lines = parse_entries(df, project=proj, file=file_name, width=width)
         else:
             idx = define_idx(d["pos"])
             if idx not in list(df.index):

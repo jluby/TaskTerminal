@@ -6,6 +6,7 @@ import argparse
 import json
 import warnings
 from datetime import datetime
+from termcolor import colored
 
 import pandas as pd
 
@@ -139,14 +140,23 @@ def main():
             to_df.to_csv(to_path, index=False)
             from_df = from_df.loc[from_df.index != idx]
             from_df.to_csv(from_path, index=False)
-            print(
-                reformat(
-                    f"{from_name[:-1].capitalize()} item {idx} moved successfully."
+            if not d["U"]:
+                print(
+                    reformat(
+                        colored("Nice job! \u263A", color="green")
+                    )
                 )
-            )
+                timed_sleep(2)
+            else:
+                print(
+                    reformat(
+                        f"{from_name[:-1].capitalize()} item {idx} moved successfully."
+                    )
+                )
+                timed_sleep()
         else:
             print(reformat("Action cancelled."))
-        timed_sleep()
+            timed_sleep()
     
     lst.main(parse_args=False)
 

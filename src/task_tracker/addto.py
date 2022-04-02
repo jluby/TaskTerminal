@@ -28,8 +28,6 @@ from .helpers.helpers import (
     process_name
 )
 
-# TODO: allow 'sc' as schedule entry
-
 def reformat_date(date_and_time: str):
     if date_and_time[-1] in ["a", "A", "p", "P"]:
         date_and_time += "m"
@@ -81,7 +79,7 @@ def main():
         "entry_type",
         type=str,
         nargs="?",
-        default="backburner",
+        default="task",
         choices=file_options,
         help="Project list to which entry will be added.",
     )
