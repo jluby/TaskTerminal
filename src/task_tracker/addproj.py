@@ -10,7 +10,7 @@ import pandas as pd
 
 from task_tracker import lst
 
-from .helpers.helpers import check_init, data_path, reformat, timed_sleep
+from .helpers.helpers import check_init, data_path, reformat, timed_sleep, CONFIG, cols
 
 
 def main():
@@ -18,7 +18,6 @@ def main():
 
     # establish parameters
     project_list = json.load(open(f"{data_path}/project_list.json", "r"))
-    cols = ["entry", "description", "flagged", "datetime_created"]
 
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(description="Get project to add.")
@@ -44,16 +43,8 @@ def main():
     base_path = f"{data_path}/projects/{d['project']}"
 
     os.makedirs(base_path)
-    for file in ["tasks", "refs", "notes", "backburner", "scheduled", "archives"]:
-        if file in ["tasks", "backburner", "scheduled"]:
-            save_cols = cols[:2] + ["time_estimate"] + cols[2:]
-            if file == "scheduled":
-                save_cols += ["scheduled_release"]
-            elif file == "archives":
-                save_cols += ["datetime_archived"]
-        else:
-            save_cols = cols
-        pd.DataFrame(columns=save_cols).to_csv(
+    for file in CONFIG.keys():
+        pd.DataFrame(columns=cols).to_csv(
             f"{base_path}/{file}.csv", index=False
         )
 

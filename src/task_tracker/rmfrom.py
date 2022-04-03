@@ -11,10 +11,10 @@ import pandas as pd
 from task_tracker import lst
 
 from .helpers.helpers import (
+    CONFIG,
     check_init,
     data_path,
     define_idx,
-    get_bonus_width,
     halftab,
     pkg_path,
     reformat,
@@ -38,10 +38,11 @@ def main():
         "ref_proj",
         type=str,
         nargs="?",
+        choices=project_list,
         help="Project from which entry will be removed.",
     )
     parser.add_argument(
-        "entry_type",
+        "file",
         type=str,
         nargs="?",
         choices=file_options,
@@ -72,17 +73,17 @@ def main():
                 input_type="error",
             )
         )
-    if d["entry_type"] is None:
+    if d["file"] is None:
         raise ValueError(
             reformat(
-                f"No entry type provided. One of ['task', 'ref', 'note'] within '{d['ref_proj']}' must be specified.",
+                f"No entry type provided. One of {CONFIG.keys()} (or an alias) within '{d['ref_proj']}' must be specified.",
                 input_type="error",
             )
         )
     elif d["pos"] is None:
         raise ValueError(
             reformat(
-                f"No positional index provided. Index within {d['entry_type']} must be specified.",
+                f"No positional index provided. Index within {d['file']} must be specified.",
                 input_type="error",
             )
         )
@@ -94,10 +95,9 @@ def main():
                 input_type="error",
             )
         )
-    d["pos"] = list(set(d["pos"]))
+    d["pos"] = list(dict.fromkeys(d["pos"]))
 
-    file_name = process_file(d["entry_type"])
-    bonus_width = get_bonus_width(file_name)
+    file_name = process_file(d["file"])
 
     base_path = f"{data_path}/projects/{d['ref_proj']}"
     path = f"{base_path}/{file_name}.csv"
@@ -113,7 +113,7 @@ def main():
         iloc = df.index.get_loc(idx)
         to_be_removed = df.iloc[iloc]
         q_str = halftab + "Remove the below entry? (y/n)"
-        set_entry_size(to_be_removed, min_width=len(q_str)+1, additional_width=21+bonus_width, max_width=70+bonus_width)
+        set_entry_size(to_be_removed, min_width=len(q_str)+1, additional_width=23, max_width=72)
         confirmed = input(
             f"\n{q_str}\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
         )
@@ -129,7 +129,7 @@ def main():
             df.to_csv(path, index=False)
             print(
                 reformat(
-                    f"{d['entry_type'].capitalize()} item {idx} removed successfully."
+                    f"{d['file'].capitalize()} item {idx} removed successfully."
                 )
             )
         else:

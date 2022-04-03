@@ -15,11 +15,12 @@ from .helpers.helpers import (
     parse_description,
     parse_entries,
     pkg_path,
+    file_options,
     print_lines,
     reformat,
-    file_options,
     process_file,
-    check_scheduled
+    check_scheduled,
+    CONFIG
 )
 
 # establish parameters
@@ -27,7 +28,7 @@ templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 hidden_list = json.load(open(f"{data_path}/hidden_project_list.json", "r"))
 project_list = [p for p in project_list if p not in hidden_list]
-
+WIDTH = 55
 
 def main(parse_args=True):
     check_init()
@@ -63,6 +64,7 @@ def main(parse_args=True):
         default=False,
         help="If provided, list only flagged entries.",
     )
+
     last_lst_path = f"{data_path}/last_lst.json"
     if parse_args:
         d = vars(parser.parse_args())
@@ -102,28 +104,27 @@ def main(parse_args=True):
             )
         )
 
-    file_name = process_file(d["file"])
+    file = process_file(d["file"])
 
-    width = 55
     if d["ref_proj"] in ["all", "ALL"]:
         lines = []
         for proj in project_list:
-            df = pd.read_csv(f"{data_path}/projects/{proj}/{file_name}.csv")
-            proj_lines = parse_entries(df, project=proj, file=file_name, width=width)
+            df = pd.read_csv(f"{data_path}/projects/{proj}/{file}.csv")
+            proj_lines = parse_entries(df, project=proj, file=file, width=WIDTH)
             lines += proj_lines
         lines += [""]
     else:
         df = pd.read_csv(
-            f"{data_path}/projects/{d['ref_proj']}/{file_name}.csv"
+            f"{data_path}/projects/{d['ref_proj']}/{file}.csv"
         )
         if d["pos"] is None:
-            lines = parse_entries(df, project=proj, file=file_name, width=width)
+            lines = parse_entries(df, project=proj, file=file, width=WIDTH)
         else:
             idx = define_idx(d["pos"])
             if idx not in list(df.index):
                 raise ValueError(
                     reformat(
-                        f"Provided index not found in project '{d['ref_proj']}' file '{file_name}'. To view file contents, run {templates['list_proj_and_type']}.",
+                        f"Provided index not found in project '{d['ref_proj']}' file '{file}'. To view file contents, run {templates['list_proj_and_type']}.",
                         input_type="error",
                     )
                 )
@@ -131,11 +132,11 @@ def main(parse_args=True):
                 lines = parse_description(df.iloc[idx])
 
     if not d["pos"]:
-        print(f"\n---{file_name.upper()}---")
+        print(f"\n---{file.upper()}---")
         extra_height = 2
     else:
         extra_height = 1
-    print_lines(lines, width=width, extra_height=extra_height)
+    print_lines(lines, width=WIDTH, extra_height=extra_height)
 
 
 if __name__ == "__main__":

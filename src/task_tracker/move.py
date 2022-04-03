@@ -8,6 +8,7 @@ import pandas as pd
 from task_tracker import lst
 
 from .helpers.helpers import (
+    CONFIG,
     check_init,
     data_path,
     define_idx,
@@ -33,10 +34,11 @@ def main():
         "ref_proj",
         type=str,
         nargs="?",
+        choices=project_list,
         help="Project in which entry will be moved.",
     )
     parser.add_argument(
-        "entry_type",
+        "file",
         type=str,
         nargs="?",
         choices=file_options,
@@ -74,10 +76,10 @@ def main():
                 input_type="error",
             )
         )
-    if d["entry_type"] is None:
+    if d["file"] is None:
         raise ValueError(
             reformat(
-                f"No entry type provided. One of ['task', 'ref', 'note'] must be specified within '{d['ref_proj']}'.",
+                f"No entry type provided. One of {CONFIG.keys()} (or an alias) within '{d['ref_proj']}' must be specified.",
                 input_type="error",
             )
         )
@@ -91,7 +93,7 @@ def main():
             )
         )
 
-    file = process_file(d["entry_type"])
+    file = process_file(d["file"])
 
     from_idx = define_idx(d["from"])
     to_idx = define_idx(d["to"])

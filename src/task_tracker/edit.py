@@ -8,12 +8,15 @@ import json
 import pandas as pd
 import numpy as np
 
+from datetime import datetime
+
 pd.options.mode.chained_assignment = None
 from contextlib import suppress
 
 from task_tracker import lst
 
 from .helpers.helpers import (
+    CONFIG,
     check_init,
     data_path,
     define_idx,
@@ -26,13 +29,12 @@ from .helpers.helpers import (
     set_entry_size_manual,
     file_options,
     process_file,
-    get_bonus_width
+    reformat_date
 )
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
-
 
 def main():
     check_init()
@@ -43,10 +45,11 @@ def main():
         "ref_proj",
         type=str,
         nargs="?",
+        choices=project_list,
         help="Project from which entry will be removed.",
     )
     parser.add_argument(
-        "entry_type",
+        "file",
         type=str,
         nargs="?",
         choices=file_options,
@@ -77,23 +80,22 @@ def main():
                 input_type="error",
             )
         )
-    if d["entry_type"] is None:
+    if d["file"] is None:
         raise ValueError(
             reformat(
-                f"No entry type provided. One of ['task', 'ref', 'note', 'backburner' (or 'back')] within '{d['ref_proj']}' must be specified.",
+                f"No entry type provided. One of {CONFIG.keys()} (or an alias) within '{d['ref_proj']}' must be specified.",
                 input_type="error",
             )
         )
     elif d["pos"] is None:
         raise ValueError(
             reformat(
-                f"No positional index provided. Index within {d['entry_type']} must be specified.",
+                f"No positional index provided. Index within {d['file']} must be specified.",
                 input_type="error",
             )
         )
 
-    file_name = process_file(d["entry_type"])
-    bonus_width = get_bonus_width(file_name)
+    file_name = process_file(d["file"])
 
     base_path = f"{data_path}/projects/{d['ref_proj']}"
     path = f"{base_path}/{file_name}.csv"
@@ -110,7 +112,7 @@ def main():
     to_be_edited.index = [
         f"{c} ({i})" for i, c in enumerate(to_be_edited.index)
     ]
-    set_entry_size(to_be_edited, min_width=53, max_width=74 + bonus_width, additional_height=5, additional_width=25 + bonus_width)
+    set_entry_size(to_be_edited, min_width=53, max_width=76, additional_height=5, additional_width=27)
     val_idx = int(
         input(
             f"\n{halftab}Which item would you like to edit (enter index)?\n\n{to_be_edited}\n{halftab}"
@@ -119,8 +121,9 @@ def main():
     edit_lines = split_to_width(str(to_be_edited[val_idx]), linelen=50)
     set_entry_size_manual(6+len(edit_lines), np.max([len(l) for l in edit_lines])+10)
     print(f"\n{halftab}{to_be_edited.index[val_idx][:-4].capitalize()} was:"); [print(f"{halftab}{l}") for l in edit_lines]; print(f"{halftab}{type(to_be_edited[val_idx])}\n")
+    is_date = "datetime" in to_be_edited.index[val_idx]
     new_value = None
-    while type(new_value) != type(to_be_edited[val_idx]):
+    while not (type(new_value) == type(to_be_edited[val_idx]) and not is_date) and not ((type(new_value) is datetime) and is_date):
         with suppress(ValueError):
             new_value = input(
                 reformat(
@@ -130,8 +133,16 @@ def main():
             )
             if to_be_edited.index[val_idx][:4] == "desc" and type(new_value) is str:
                 break
-            new_value = type(to_be_edited[val_idx])(new_value)
 
+            if "datetime" in to_be_edited.index[val_idx]:
+                if new_value in ["NaN", "NA", "na", "nan"]:
+                    new_value = float("NaN"); break
+                new_value = reformat_date(new_value)
+            else:
+                new_value = type(to_be_edited[val_idx])(new_value)
+
+    if is_date and not pd.isna(new_value):
+        new_value = new_value.strftime("%m/%d/%Y %H:%M:%S")
     to_be_edited.iloc[val_idx] = new_value
     df.iloc[idx] = to_be_edited.tolist()
     df.to_csv(path, index=False)

@@ -5,17 +5,15 @@
 import argparse
 import json
 from contextlib import suppress
-from datetime import datetime, timedelta
-from datetime import date as dt
-from dateutil.relativedelta import relativedelta
-from parse import *
-import time
+from datetime import datetime
 
 import pandas as pd
 
 from task_tracker import lst
 
 from .helpers.helpers import (
+    columns,
+    CONFIG,
     check_init,
     data_path,
     define_idx,
@@ -25,40 +23,9 @@ from .helpers.helpers import (
     timed_sleep,
     file_options,
     process_file,
-    process_name
+    process_name,
+    reformat_date
 )
-
-def reformat_date(date_and_time: str):
-    if date_and_time[-1] in ["a", "A", "p", "P"]:
-        date_and_time += "m"
-    if " " in date_and_time:
-        date_str, time_str = date_and_time.split(" ")
-    elif not date_and_time[-1] in ["M", "m"]:
-        date_str, time_str = date_and_time, "00:00"
-    else:
-        date, time_str = dt.today(), date_and_time
-        date_str = None
-    
-    if date_str:
-        if date_str.count("/") == 0:
-            today = dt.today()
-            day = time.strptime(date_str, "%a").tm_wday
-            remainder = (day-today.weekday()-1) % 7 + 1
-            date = today + timedelta(days=remainder)
-        else:
-            p = [v.zfill(2) for v in parse("{}/{}", date_str)]
-            date = datetime.strptime(f"{p[0]}/{p[1]}", "%m/%d")
-            date += relativedelta(years=datetime.now().year - date.year)
-            if datetime.now() > date:
-                date += relativedelta(years=1)
-    
-    if ":" in time_str:
-        p = [v.zfill(2) for v in parse("{}:{}", time_str[:-2])]
-        tm = datetime.strptime(f"{p[0]}:{p[1]}{time_str[-2:]}", "%I:%M%p").time()
-    else:
-        tm = datetime.strptime(f"{time_str}", "%I%p").time()
-    
-    return datetime.combine(date, tm)
 
 def main():
     check_init()
@@ -73,10 +40,11 @@ def main():
         "ref_proj",
         type=str,
         nargs="?",
+        choices=project_list,
         help="Project to which entry will be added.",
     )
     parser.add_argument(
-        "entry_type",
+        "file",
         type=str,
         nargs="?",
         default="task",
@@ -94,6 +62,12 @@ def main():
         action=argparse.BooleanOptionalAction,
         default=False,
         help="If provided, flag as important.",
+    )
+    parser.add_argument(
+        "-s",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="If provided, explicitly schedule movement.",
     )
     d = vars(parser.parse_args())
 
@@ -123,32 +97,36 @@ def main():
             )
         )
 
-    file_name = process_file(d["entry_type"])
-    entry_name = process_name(d["entry_type"])
+    file = process_file(d["file"])
+    entry_name = process_name(d["file"])
 
-    path = f"{data_path}/projects/{d['ref_proj']}/{file_name}.csv"
+    entry_dict = {k:None for k in columns}
+
+    path = f"{data_path}/projects/{d['ref_proj']}/{file}.csv"
     df = pd.read_csv(path)
-    entry = ""
-    description = ""
+    entry_dict["entry"] = ""
+    entry_dict["description"] = ""
     entry_str = (
         f"Provide {entry_name} entry:"
         if entry_name != "ref"
         else f"Provide {entry_name} description:"
     )
-    while entry == "":
-        entry = input(reformat(entry_str, input_type="input"))
+    while entry_dict["entry"] == "":
+        entry_dict["entry"] = input(reformat(entry_str, input_type="input"))
     description_str = (
         f"Describe {entry_name} entry:"
         if entry_name != "ref"
         else f"Paste reference below:"
     )
-    description = input(reformat(description_str, input_type="input"))
-    entry_time = str(datetime.now().strftime("%m/%d/%Y %H:%M:%S"))
-    if entry_name in ["task", "back", "backburner", "schedule"]:
-        time_estimate = ""
-        while type(time_estimate) is not float:
+    entry_dict["description"] = input(reformat(description_str, input_type="input"))
+    entry_dict["datetime_created"] = str(datetime.now().strftime("%m/%d/%Y %H:%M:%S"))
+    entry_dict["flagged"] = d["flag"]
+
+    if "hours" in CONFIG[file].keys() and bool(CONFIG[file]["hours"]):
+        entry_dict["time_estimate"] = ""
+        while type(entry_dict["time_estimate"]) is not float:
             with suppress(ValueError):
-                time_estimate = float(
+                entry_dict["time_estimate"] = float(
                     input(
                         reformat(
                             "How long will this take (in hours)?",
@@ -156,22 +134,22 @@ def main():
                         )
                     )
                 )
-        out_ls = [entry, description, time_estimate, d["flag"], entry_time]
-        if entry_name == "schedule":
-            release = ""
-            while type(release) is not datetime or not release > datetime.now():
-                #with suppress(ValueError):
-                release = input(
-                    reformat(
-                        "When should this be released? (%-m/%-d %H:%M)",
-                        input_type="input",
-                        )
-                )
-                release = reformat_date(release)
-            out_ls.append(release.strftime("%m/%d/%Y %H:%M:%S"))
-    else:
-        out_ls = [entry, description, d["flag"], entry_time]
-    df.loc[len(df)] = out_ls
+        if ("schedule" in CONFIG[file].keys() and bool(CONFIG[file]["schedule"])) or d["s"]:
+            if "send_to" not in CONFIG[file].keys():
+                raise ValueError(reformat("Cannot schedule an entry to a file with no 'send_to' parameter."))
+            scheduled = ""
+            while type(scheduled) is not datetime or not scheduled > datetime.now():
+                with suppress(ValueError):
+                    scheduled = input(
+                        reformat(
+                            "When should this be released? (%-m/%-d %H:%M)",
+                            input_type="input",
+                            )
+                    )
+                    scheduled = reformat_date(scheduled)
+            entry_dict["datetime_scheduled"] = scheduled.strftime("%m/%d/%Y %H:%M:%S")
+    
+    df = df.append(entry_dict, ignore_index=True)
     df = move(df, from_index=-1, to_index=define_idx(d["pos"]))
     df.to_csv(path, index=False)
     df = pd.read_csv(path)
@@ -188,6 +166,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-# TODO: fix sizing on schedule rm / edit / whatever

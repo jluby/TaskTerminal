@@ -7,11 +7,18 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from termcolor import colored
-from datetime import datetime
+from datetime import datetime, timedelta
+from datetime import date as dt
+from dateutil.relativedelta import relativedelta
+from parse import *
+import time
 
 pkg_path = Path(__file__).parents[1]
 data_path = f"{pkg_path}/.package_data"
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
+CONFIG = json.load(open(f"{pkg_path}/helpers/config.json", "r"))
+file_options = list(CONFIG.keys()) + sum([CONFIG[k]["aliases"] for k in CONFIG.keys()], [])
+columns = ["entry", "description", "time_estimate", "flagged", "datetime_created", "datetime_moved", "datetime_scheduled"]
 
 halftab = " " * 4
 
@@ -85,64 +92,51 @@ file_options = [
     "s"
 ]
 
-def process_file(file: str):
-    real_files = ["tasks", "archives", "notes", "refs", "scheduled", "backburner"]
+def process_file(filename: str):
+    files = CONFIG.keys()
 
-    if file in ["task", "ref", "note", "archive"]:
-        file_name = file + "s"
-    elif file == "back":
-        file_name = "backburner"
-    elif file == "schedule":
-        file_name = "scheduled"
-    elif len(file) == 1:
-        file_name = [f for f in real_files if f[0] == file][0]
+    if filename in files:
+        return filename
     else:
-        file_name = file
-    
-    return file_name
+        for file in files:
+            if filename in CONFIG[file]["aliases"]:
+                return file
+    raise ValueError(f"File {filename} not found in file names or aliases.")
+            
 
-def process_name(file: str):
-    names = ["task", "archive", "note", "schedule", "backburner"]
+def process_name(filename: str):
+    file = process_file(filename)
+    return CONFIG[file]["file_name"]
 
-    if file in ["tasks", "refs", "notes", "archives", "scheduled"]:
-        name = file[:-1]
-    elif file == "back":
-        name = "backburner"
-    elif file == "arc":
-        name = "archives"
-    elif len(file) == 1:
-        name = [n for n in names if n[0] == file][0]
-    else:
-        name = file
-    
-    return name
+def transfer_row(idx, from_df, to_df):
+    iloc = from_df.index.get_loc(idx)
+    to_be_moved = from_df.iloc[iloc]
+    to_df = to_df.append(to_be_moved.to_dict(), ignore_index=True)
+    from_df = from_df.loc[from_df.index != idx]
 
-def get_bonus_width(file_name: str):
-    if file_name in ["archives", "scheduled"]:
-        bonus_width = 1
-    else:
-        bonus_width = 0
+    to_df.loc[len(to_df)-1, "datetime_moved"] = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
 
-    return bonus_width
+    return from_df, to_df
 
 def check_scheduled(project_list = project_list):
+
+    chain_files = [file for file in CONFIG.keys() if "send_to" in CONFIG[file].keys()]
+
     moves = {k:0 for k in project_list}
     for project in project_list:
-        sc_path = f"{data_path}/projects/{project}/scheduled.csv"
-        back_path = f"{data_path}/projects/{project}/backburner.csv"
-        sc_df = pd.read_csv(sc_path)
-        back_df = pd.read_csv(back_path)
-        for idx, row in enumerate(sc_df.to_dict("records")):
-            release_time = datetime.strptime(row["scheduled_release"], "%m/%d/%Y %H:%M:%S")
-            # Move if past date
-            if release_time < datetime.now():
-                iloc = sc_df.index.get_loc(idx)
-                to_be_moved = sc_df.iloc[iloc]
-                back_df.loc[len(back_df)] = to_be_moved.tolist()[:-1] # drop release time
-                back_df.to_csv(back_path, index=False)
-                sc_df = sc_df.loc[sc_df.index != idx]
-                sc_df.to_csv(sc_path, index=False)
-                moves[project] += 1
+        for file in chain_files:
+            from_path = f"{data_path}/projects/{project}/{file}.csv"
+            to_path = f"{data_path}/projects/{project}/{CONFIG[file]['send_to']}.csv"
+            from_df = pd.read_csv(from_path)
+            to_df = pd.read_csv(to_path)
+
+            for idx, row in enumerate(from_df.loc[~from_df["datetime_scheduled"].isna()].to_dict("records")):
+                release_time = datetime.strptime(row["datetime_scheduled"], "%m/%d/%Y %H:%M:%S")
+                # Move if past date
+                if release_time < datetime.now():
+                    from_df, to_df = transfer_row(idx, from_df, to_df)
+                    to_df.to_csv(to_path, index=False)
+                    moves[project] += 1
     
     k_w_moves = sum([v > 0 for v in moves.values()])
     if k_w_moves:
@@ -150,7 +144,7 @@ def check_scheduled(project_list = project_list):
         for k,v in moves.items():
             if v > 0:
                 p = "s" if v > 1 else ""
-                print(f"{halftab}({v}) item{p} from {k} activated from schedule.")
+                print(f"{halftab}({v}) item{p} from {k} moved on schedule.")
         print("")
         set_entry_size_manual(height=k_w_moves+3, width=51)
         timed_sleep(1.5)
@@ -235,11 +229,12 @@ def get_project_stats(project, file):
     return header, p_hours
 
 def process_rowlines(idx, row, width, file):
-    for key in ["flagged", "time_estimate", "scheduled_release" ,"datetime_archived"]:
-        if key not in row:
-            row[key] = None
 
-    linelen = width - 23 if file in ["scheduled", "archives"] else width - 20
+    if "stat" in CONFIG[file].keys() and "datetime" in CONFIG[file]["stat"]:
+        linelen = width - 23
+    else:
+        linelen = width - 20
+
     lines = parse_row(
         row["entry"], linelen=linelen
     )
@@ -248,21 +243,24 @@ def process_rowlines(idx, row, width, file):
     lines = [colored(l, "red", attrs=["bold"]) if row["flagged"] else l for l in lines]
     if row["flagged"]:
         linelen -= 13
-    if type(row["time_estimate"]) is float and not (row["scheduled_release"] or row["datetime_archived"]):
-        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{row['time_estimate']}hrs")
-    elif row["scheduled_release"]:
-        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(row['scheduled_release']): >{10}}")
-    elif row["datetime_archived"]:
-        lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(row['datetime_archived']): >{10}}")
-    else:
+    print(lines)
+    if "stat" not in CONFIG[file].keys():
         lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}")
+    else:
+        stat = CONFIG[file]["stat"]
+        if stat == "time_estimate":
+            lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{row[stat]}hrs")
+        elif "datetime" in stat:
+            lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(row[stat]): >{10}}")
 
     for line in lines[1:]:
         lines_p.append(f"{' '*9}{line: <{linelen}}")
     return lines_p
 
 def process_date_str(date_str: str) -> str:
-    s = f" {date_str[:10]}".replace(" 0", " ").replace("/0", "/")
+    print(date_str)
+    print(type(date_str))
+    s = f"{date_str[:10]}".replace(" 0", " ").replace("/0", "/")
     print(s, len(s))
     return s
 
@@ -286,3 +284,35 @@ def move(df: pd.DataFrame, from_index: int, to_index: int) -> pd.DataFrame:
     to_index = to_index if to_index != -1 else len(idx)
     idx.insert(to_index, from_index)
     return df.iloc[idx].reset_index(drop=True)
+
+def reformat_date(date_and_time: str):
+    if date_and_time[-1] in ["a", "A", "p", "P"]:
+        date_and_time += "m"
+    if " " in date_and_time:
+        date_str, time_str = date_and_time.split(" ")
+    elif not date_and_time[-1] in ["M", "m"]:
+        date_str, time_str = date_and_time, "00:00"
+    else:
+        date, time_str = dt.today(), date_and_time
+        date_str = None
+    
+    if date_str:
+        if date_str.count("/") == 0:
+            today = dt.today()
+            day = time.strptime(date_str, "%a").tm_wday
+            remainder = (day-today.weekday()-1) % 7 + 1
+            date = today + timedelta(days=remainder)
+        else:
+            p = [v.zfill(2) for v in parse("{}/{}", date_str)]
+            date = datetime.strptime(f"{p[0]}/{p[1]}", "%m/%d")
+            date += relativedelta(years=datetime.now().year - date.year)
+            if datetime.now() > date:
+                date += relativedelta(years=1)
+    
+    if ":" in time_str:
+        p = [v.zfill(2) for v in parse("{}:{}", time_str[:-2])]
+        tm = datetime.strptime(f"{p[0]}:{p[1]}{time_str[-2:]}", "%I:%M%p").time()
+    else:
+        tm = datetime.strptime(f"{time_str}", "%I%p").time()
+    
+    return datetime.combine(date, tm)

@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 """Move item from backburner to active list or vice versa."""
 
+# TODO: make format and push up to git
+
 # base imports
 import argparse
 import json
 import warnings
 
 import pandas as pd
+from termcolor import colored
 
 from task_tracker import lst
 
 from .helpers.helpers import (
+    CONFIG,
     check_init,
     data_path,
     define_idx,
@@ -19,25 +23,63 @@ from .helpers.helpers import (
     reformat,
     set_entry_size,
     timed_sleep,
+    process_file,
+    file_options,
+    transfer_row
 )
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 
+def define_chain(file: str) -> list:
+    def get_prev(file):
+        senders = [f for f in CONFIG.keys() if "send_to" in CONFIG[f].keys() and CONFIG[f]["send_to"] == file]
+        if len(senders) > 1:
+            warnings.warn(f"Multiple files send to the provided file. Using the first in config.json: {senders[0]}.")
+        if len(senders) > 0:
+            return senders[0]
+
+    def fill_prev(file, chain):
+        prev = get_prev(file)
+        if prev:
+            chain = [get_prev(file)] + chain
+            return fill_prev(chain[0], chain)
+        
+        return chain
+
+    def fill_next(file, chain):
+        chain += [file]
+        if "send_to" in CONFIG[file].keys():
+            return fill_next(CONFIG[file]["send_to"], chain)
+        
+        return chain
+
+    next = fill_next(file, [])
+    prev = fill_prev(file, [])
+
+    return prev + next
 
 def main():
     check_init()
 
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(
-        description="Get entry to move from backburner to active task list."
+        description="Get entry to move from to config 'send_to' file."
     )
     parser.add_argument(
         "ref_proj",
         type=str,
         nargs="?",
+        choices=project_list,
         help="Project in which entry resides.",
+    )
+    parser.add_argument(
+        "file",
+        type=str,
+        nargs="?",
+        choices=file_options,
+        help="File in which entry resides.",
     )
     parser.add_argument(
         "pos",
@@ -49,7 +91,7 @@ def main():
         "-U",
         action=argparse.BooleanOptionalAction,
         default=False,
-        help="If provided, reverse movement (move from tasks to backburner).",
+        help="If provided, reverse movement.",
     )
     d = vars(parser.parse_args())
 
@@ -80,6 +122,14 @@ def main():
                 input_type="error",
             )
         )
+    if d["file"] is None:
+        raise ValueError(
+            reformat(
+                f"No entry type provided. One of {CONFIG.keys()} (or an alias) within '{d['ref_proj']}' must be specified.",
+                input_type="error",
+            )
+        )
+
     d["pos"] = [define_idx(i) for i in d["pos"]]
     if len(set(d["pos"])) != len(d["pos"]):
         warnings.warn(
@@ -88,32 +138,39 @@ def main():
                 input_type="error",
             )
         )
-    d["pos"] = list(set(d["pos"]))
+    d["pos"] = list(dict.fromkeys(d["pos"]))
 
-    task_path = f"{data_path}/projects/{d['ref_proj']}/tasks.csv"
-    back_path = f"{data_path}/projects/{d['ref_proj']}/backburner.csv"
+    d["file"] = process_file(d["file"])
+    chain = define_chain(d["file"])
+
+    file_idx = chain.index(d["file"])
+    end_of_chain = False
     if not d["U"]:
-        from_path = back_path
-        to_path = task_path
-        from_name = "backburner"
+        if file_idx == len(chain):
+            raise ValueError(reformat("No 'send_to' file found in 'config.json'. Cannot perform pull.", input_type="error"))
+        to_file = chain[file_idx + 1]
+        end_of_chain = file_idx + 2 == len(chain)
     else:
-        from_path = task_path
-        to_path = back_path
-        from_name = "tasks"
+        if file_idx == 0:
+            raise ValueError(reformat("No sender file found in 'config.json'. Cannot perform push.", input_type="error"))
+        to_file = chain[chain.index(d["file"]) - 1]
+    
+    from_path = f"{data_path}/projects/{d['ref_proj']}/{d['file']}.csv"
+    to_path = f"{data_path}/projects/{d['ref_proj']}/{to_file}.csv"
     from_df = pd.read_csv(from_path)
     to_df = pd.read_csv(to_path)
     for idx in d['pos']:
         if idx not in list(from_df.index):
             raise ValueError(
                 reformat(
-                    f"Provided index {idx} not found in project '{d['ref_proj']}' {from_name}.",
+                    f"Provided index {idx} not found in project '{d['ref_proj']}' '{d['file']}'.",
                     input_type="error",
                 )
             )
         iloc = from_df.index.get_loc(idx)
         to_be_moved = from_df.iloc[iloc]
-        de = "de" if d["U"] else ""
-        q_str = halftab + f"{f'{de}activate'.capitalize()} the below entry? (y/n)"
+        m_str = "Pull" if not d["U"] else "Push"
+        q_str = halftab + f"{m_str} the below entry? (y/n)"
         set_entry_size(to_be_moved, additional_height=5, min_width=len(q_str)+1)
         confirmed = input(
             f"\n{q_str}\n\n{to_be_moved}\n{halftab}"
@@ -125,18 +182,26 @@ def main():
                 )
             )
         if confirmed in ["y", "Y"]:
-            to_df.loc[len(to_df)] = to_be_moved.tolist()
+            from_df, to_df = transfer_row(idx, from_df, to_df)
             to_df.to_csv(to_path, index=False)
-            from_df = from_df.loc[from_df.index != idx]
             from_df.to_csv(from_path, index=False)
-            print(
-                reformat(
-                    f"{from_name.capitalize()} item {idx} moved successfully."
+            if end_of_chain:
+                print(
+                    reformat(
+                        colored("-- \u263A Nice job! \u263A --", color="green", attrs=["bold", "blink"])
+                    )
                 )
-            )
+                timed_sleep(2)
+            else:
+                print(
+                    reformat(
+                        f"Item moved successfully to {to_file}."
+                    )
+                )
+                timed_sleep()
         else:
             print(reformat("Action cancelled."))
-        timed_sleep()
+            timed_sleep()
 
     lst.main(parse_args=False)
 
