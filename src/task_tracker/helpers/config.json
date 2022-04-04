@@ -3,37 +3,34 @@
     {
         "stat": "datetime_scheduled",
         "aliases": ["s", "schedule"],
-        "hours": 1,
-        "schedule": 1,
         "send_to": "backburner",
-        "file_name": "schedule"
+        "file_name": "schedule",
+        "attrs": ["hours", "schedule"]
     },
     "backburner": 
     {
         "stat": "time_estimate",
         "aliases": ["b", "back"],
         "stats_from_prev": ["n"],
-        "hours": 1,
-        "show_total": 1,
         "send_to": "tasks",
-        "file_name": "backburner"
+        "file_name": "backburner",
+        "attrs": ["hours", "show_total"]
     },
     "tasks":
     {
         "stat": "time_estimate",
         "aliases": ["t", "task"],
         "stats_from_prev": ["n", "total"],
-        "hours": 1,
-        "show_total": 1,
         "send_to": "archives",
-        "file_name": "task"
+        "file_name": "task",
+        "attrs": ["hours", "show_total"]
     },
     "archives":
     {
         "stat": "datetime_moved",
         "aliases": ["a", "archive"],
-        "hours": 1,
-        "file_name": "archive"
+        "file_name": "archive",
+        "attrs": ["hours"]
     },
     "notes":
     {

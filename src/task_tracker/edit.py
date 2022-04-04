@@ -15,6 +15,8 @@ from contextlib import suppress
 
 from task_tracker import lst
 
+# TODO: fix previous list and total printing
+
 from .helpers.helpers import (
     CONFIG,
     check_init,

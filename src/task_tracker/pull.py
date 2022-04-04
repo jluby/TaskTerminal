@@ -25,40 +25,13 @@ from .helpers.helpers import (
     timed_sleep,
     process_file,
     file_options,
-    transfer_row
+    transfer_row,
+    define_chain
 )
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
-
-def define_chain(file: str) -> list:
-    def get_prev(file):
-        senders = [f for f in CONFIG.keys() if "send_to" in CONFIG[f].keys() and CONFIG[f]["send_to"] == file]
-        if len(senders) > 1:
-            warnings.warn(f"Multiple files send to the provided file. Using the first in config.json: {senders[0]}.")
-        if len(senders) > 0:
-            return senders[0]
-
-    def fill_prev(file, chain):
-        prev = get_prev(file)
-        if prev:
-            chain = [get_prev(file)] + chain
-            return fill_prev(chain[0], chain)
-        
-        return chain
-
-    def fill_next(file, chain):
-        chain += [file]
-        if "send_to" in CONFIG[file].keys():
-            return fill_next(CONFIG[file]["send_to"], chain)
-        
-        return chain
-
-    next = fill_next(file, [])
-    prev = fill_prev(file, [])
-
-    return prev + next
 
 def main():
     check_init()
@@ -171,7 +144,7 @@ def main():
         to_be_moved = from_df.iloc[iloc]
         m_str = "Pull" if not d["U"] else "Push"
         q_str = halftab + f"{m_str} the below entry? (y/n)"
-        set_entry_size(to_be_moved, additional_height=5, min_width=len(q_str)+1)
+        set_entry_size(to_be_moved, additional_height=5, min_width=len(q_str)+1, additional_width=23, max_width=72)
         confirmed = input(
             f"\n{q_str}\n\n{to_be_moved}\n{halftab}"
         )

@@ -134,7 +134,7 @@ def main():
                         )
                     )
                 )
-        if ("schedule" in CONFIG[file].keys() and bool(CONFIG[file]["schedule"])) or d["s"]:
+        if ("attrs" in CONFIG[file].keys() and "schedule" in CONFIG[file]["attrs"]) or d["s"]:
             if "send_to" not in CONFIG[file].keys():
                 raise ValueError(reformat("Cannot schedule an entry to a file with no 'send_to' parameter."))
             scheduled = ""

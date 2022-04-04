@@ -2,7 +2,7 @@
 
 ## Project Overview
 This project seeks to provide utilities for task tracking. Tasks are seperated by project. The core utilities of this project are:
- * Create tasks, references, and notes then store to project-specific to-do's
+ * Create entries then store to project-specific, user-specified lists
  * View / sort lists, including user-provided task descriptions
  * Allow for backburner tasks which can be pulled into active list (and pushed back)
  * Store completed tasks (with creation / completion dates) to project-specific dataframe, for easy future reference

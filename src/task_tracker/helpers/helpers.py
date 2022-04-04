@@ -2,6 +2,7 @@
 import json
 import os
 import time
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -66,31 +67,6 @@ def print_lines(lines: list, width: int, extra_height=1) -> None:
     height = len(lines) + extra_height
     set_entry_size_manual(height, print_width)
     [print(line) for line in lines]
-
-file_options = [
-    "notes",
-    "note",
-    "n",
-    "tasks",
-    "task",
-    "t",
-    "refs",
-    "ref",
-    "r",
-    "arc",
-    "a",
-    "archive",
-    "archives",
-    "back",
-    "backburner",
-    "b",
-    "schedule",
-    "scheduled",
-    "sc",
-    "sd",
-    "scd",
-    "s"
-]
 
 def process_file(filename: str):
     files = CONFIG.keys()
@@ -202,31 +178,26 @@ def parse_entries(df: pd.DataFrame, project: str, file: str, width: int) -> None
             lines += rowlines_p
     lines.append("-" * width)
 
-    if file in ["tasks", "backburner"]:
-        header_stats, hour_sum = get_project_stats(project, file)
-        if hour_sum:
-            hour_str = str(hour_sum) + 'hrs'; t_str = "T: "
-        else:
-            hour_str = ""; t_str = ""
-        lines.append(f"{header_stats: <{30}}{t_str: >{width-37}}{hour_str: <{7}}")
-    else:
-        lines.append("")
+    stats_str, hour_str = get_project_stats(project, file)
+    lines.append(f"{stats_str: <{width-10}}{hour_str: <{10}}")
     
     return lines
 
 def get_project_stats(project, file):
-    last = {"backburner": "scheduled", "tasks": "backburner"}
-    last_df = pd.read_csv(f"{data_path}/projects/{project}/{last[file]}.csv")
-    n_tasks = len(last_df)
-    l_hours = sum(last_df["time_estimate"])
-    header = f"<- {n_tasks}"
-    if file != "backburner":
-        header += f" | {l_hours}"
+    stats_str = ""; hour_str = ""
+    if "stats_from_prev" in CONFIG[file].keys():
+        prev_file = get_prev(file)
+        last_df = pd.read_csv(f"{data_path}/projects/{project}/{prev_file}.csv")
+        stats = {"n": len(last_df), "total": sum(last_df["time_estimate"])}
+        lst_stats = [str(stats[c]) for c in CONFIG[file]["stats_from_prev"]]
+        stats_str = f"<- {' | '.join(lst_stats)}" if len(lst_stats) > 0 else ""
 
-    current_df = pd.read_csv(f"{data_path}/projects/{project}/{file}.csv")
-    p_hours = sum(current_df["time_estimate"]) if len(current_df) > 1 else None
-    
-    return header, p_hours
+    if "attrs" in CONFIG[file].keys() and "hours" in CONFIG[file]["attrs"]:
+        current_df = pd.read_csv(f"{data_path}/projects/{project}/{file}.csv")
+        p_hours = np.nansum(current_df["time_estimate"]) if len(current_df) > 1 else 0
+        hour_str = "T: " + str(p_hours) + 'hrs' if p_hours > 0 else ""
+
+    return stats_str, hour_str
 
 def process_rowlines(idx, row, width, file):
 
@@ -316,3 +287,32 @@ def reformat_date(date_and_time: str):
         tm = datetime.strptime(f"{time_str}", "%I%p").time()
     
     return datetime.combine(date, tm)
+
+def define_chain(file: str) -> list:
+
+    def fill_prev(file, chain):
+        prev = get_prev(file)
+        if prev:
+            chain = [get_prev(file)] + chain
+            return fill_prev(chain[0], chain)
+        
+        return chain
+
+    def fill_next(file, chain):
+        chain += [file]
+        if "send_to" in CONFIG[file].keys():
+            return fill_next(CONFIG[file]["send_to"], chain)
+        
+        return chain
+
+    next = fill_next(file, [])
+    prev = fill_prev(file, [])
+
+    return prev + next
+
+def get_prev(file):
+    senders = [f for f in CONFIG.keys() if "send_to" in CONFIG[f].keys() and CONFIG[f]["send_to"] == file]
+    if len(senders) > 1:
+        warnings.warn(f"Multiple files send to the provided file. Using the first in config.json: {senders[0]}.")
+    if len(senders) > 0:
+        return senders[0]
