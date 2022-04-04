@@ -122,7 +122,7 @@ def main():
     entry_dict["datetime_created"] = str(datetime.now().strftime("%m/%d/%Y %H:%M:%S"))
     entry_dict["flagged"] = d["flag"]
 
-    if "hours" in CONFIG[file].keys() and bool(CONFIG[file]["hours"]):
+    if "attrs" in CONFIG[file].keys() and "hours" in CONFIG[file]["attrs"]:
         entry_dict["time_estimate"] = ""
         while type(entry_dict["time_estimate"]) is not float:
             with suppress(ValueError):
