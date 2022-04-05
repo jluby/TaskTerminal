@@ -190,6 +190,7 @@ def get_project_stats(project, file):
         last_df = pd.read_csv(f"{data_path}/projects/{project}/{prev_file}.csv")
         stats = {"n": len(last_df), "total": sum(last_df["time_estimate"])}
         lst_stats = [str(stats[c]) for c in CONFIG[file]["stats_from_prev"]]
+        lst_stats = ["0"] if list(set(lst_stats)) == ["0"] else lst_stats
         stats_str = f"<- {' | '.join(lst_stats)}" if len(lst_stats) > 0 else ""
 
     if "attrs" in CONFIG[file].keys() and "hours" in CONFIG[file]["attrs"]:
