@@ -29,8 +29,7 @@
     {
         "stat": "datetime_moved",
         "aliases": ["a", "archive"],
-        "file_name": "archive",
-        "attrs": ["hours"]
+        "file_name": "archive"
     },
     "notes":
     {

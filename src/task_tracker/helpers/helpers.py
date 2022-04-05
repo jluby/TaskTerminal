@@ -91,6 +91,7 @@ def transfer_row(idx, from_df, to_df):
     from_df = from_df.loc[from_df.index != idx]
 
     to_df.loc[len(to_df)-1, "datetime_moved"] = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+    to_df.loc[len(to_df)-1, "datetime_scheduled"] = float("NaN")
 
     return from_df, to_df
 
@@ -106,13 +107,17 @@ def check_scheduled(project_list = project_list):
             from_df = pd.read_csv(from_path)
             to_df = pd.read_csv(to_path)
 
-            for idx, row in enumerate(from_df.loc[~from_df["datetime_scheduled"].isna()].to_dict("records")):
-                release_time = datetime.strptime(row["datetime_scheduled"], "%m/%d/%Y %H:%M:%S")
-                # Move if past date
-                if release_time < datetime.now():
-                    from_df, to_df = transfer_row(idx, from_df, to_df)
-                    to_df.to_csv(to_path, index=False)
-                    moves[project] += 1
+            for idx, row in enumerate(from_df.to_dict("records")):
+                if pd.isna(row["datetime_scheduled"]):
+                    pass
+                else:
+                    release_time = datetime.strptime(row["datetime_scheduled"], "%m/%d/%Y %H:%M:%S")
+                    # Move if past date
+                    if release_time < datetime.now():
+                        from_df, to_df = transfer_row(idx, from_df, to_df)
+                        from_df.to_csv(from_path, index=False)
+                        to_df.to_csv(to_path, index=False)
+                        moves[project] += 1
     
     k_w_moves = sum([v > 0 for v in moves.values()])
     if k_w_moves:
