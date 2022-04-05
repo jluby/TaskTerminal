@@ -129,7 +129,7 @@ def main():
             df.to_csv(path, index=False)
             print(
                 reformat(
-                    f"{d['file'].capitalize()} item {idx} removed successfully."
+                    f"{file_name.capitalize()} item {idx} removed successfully."
                 )
             )
         else:
