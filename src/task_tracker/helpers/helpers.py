@@ -193,7 +193,7 @@ def get_project_stats(project, file):
     if "stats_from_prev" in CONFIG[file].keys():
         prev_file = get_prev(file)
         last_df = pd.read_csv(f"{data_path}/projects/{project}/{prev_file}.csv")
-        stats = {"n": len(last_df), "total": sum(last_df["time_estimate"])}
+        stats = {"n": len(last_df), "total": round(np.nansum(last_df["time_estimate"]),2)}
         lst_stats = [str(stats[c]) for c in CONFIG[file]["stats_from_prev"]]
         lst_stats = ["0"] if list(set(lst_stats)) == ["0"] else lst_stats
         stats_str = f"<- {' | '.join(lst_stats)}" if len(lst_stats) > 0 else ""
@@ -201,7 +201,7 @@ def get_project_stats(project, file):
     if "attrs" in CONFIG[file].keys() and "hours" in CONFIG[file]["attrs"]:
         current_df = pd.read_csv(f"{data_path}/projects/{project}/{file}.csv")
         p_hours = np.nansum(current_df["time_estimate"]) if len(current_df) > 1 else 0
-        hour_str = "T: " + str(p_hours) + 'hrs' if p_hours > 0 else ""
+        hour_str = "T: " + str(round(p_hours,2)) + 'hrs' if p_hours > 0 else ""
 
     return stats_str, hour_str
 
