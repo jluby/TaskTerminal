@@ -91,7 +91,6 @@ def transfer_row(idx, from_df, to_df):
     from_df = from_df.loc[from_df.index != idx]
 
     to_df.loc[len(to_df)-1, "datetime_moved"] = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
-    to_df.loc[len(to_df)-1, "datetime_scheduled"] = float("NaN")
 
     return from_df, to_df
 
@@ -116,6 +115,7 @@ def check_scheduled(project_list = project_list):
                     if release_time < datetime.now():
                         from_df, to_df = transfer_row(idx, from_df, to_df)
                         from_df.to_csv(from_path, index=False)
+                        to_df.loc[len(to_df)-1, "datetime_scheduled"] = float("NaN")
                         to_df.to_csv(to_path, index=False)
                         moves[project] += 1
     
