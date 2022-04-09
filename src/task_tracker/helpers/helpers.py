@@ -220,7 +220,7 @@ def process_rowlines(idx, row, width, file):
     lines = [colored(l, "red", attrs=["bold"]) if row["flagged"] else l for l in lines]
     if row["flagged"]:
         linelen -= 13
-    if "stat" not in CONFIG[file].keys():
+    if "stat" not in CONFIG[file].keys() or pd.isna(row[CONFIG[file]["stat"]]):
         lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}")
     else:
         stat = CONFIG[file]["stat"]
