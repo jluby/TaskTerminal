@@ -3,7 +3,7 @@
     {
         "stat": "datetime_scheduled",
         "aliases": ["s", "schedule"],
-        "send_to": "backburner",
+        "send_to": "tasks",
         "file_name": "schedule",
         "attrs": ["hours", "schedule"]
     },
