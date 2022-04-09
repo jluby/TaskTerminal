@@ -106,7 +106,7 @@ def main():
     base_path = f"{data_path}/projects/{d['ref_proj']}"
     path = f"{base_path}/{file_name}.csv"
     df = pd.read_csv(path)
-    idx = define_idx(d["pos"])
+    idx = define_idx(d["pos"], df)
     if idx not in list(df.index):
         raise ValueError(
             reformat(

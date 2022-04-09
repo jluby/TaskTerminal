@@ -103,16 +103,6 @@ def main():
             )
         )
 
-    d["pos"] = [define_idx(i) for i in d["pos"]]
-    if len(set(d["pos"])) != len(d["pos"]):
-        warnings.warn(
-            reformat(
-                f"Dropping duplicate values in {d['pos']}. New indices are {list(set(d['pos']))}",
-                input_type="error",
-            )
-        )
-    d["pos"] = list(dict.fromkeys(d["pos"]))
-
     d["file"] = process_file(d["file"])
     chain = define_chain(d["file"])
 
@@ -132,11 +122,22 @@ def main():
     to_path = f"{data_path}/projects/{d['ref_proj']}/{to_file}.csv"
     from_df = pd.read_csv(from_path)
     to_df = pd.read_csv(to_path)
+
+    d["pos"] = [define_idx(i, from_df) for i in d["pos"]]
+    if len(set(d["pos"])) != len(d["pos"]):
+        warnings.warn(
+            reformat(
+                f"Dropping duplicate values in {d['pos']}. New indices are {list(set(d['pos']))}",
+                input_type="error",
+            )
+        )
+    d["pos"] = list(dict.fromkeys(d["pos"]))
+    
     for idx in d['pos']:
         if idx not in list(from_df.index):
             raise ValueError(
                 reformat(
-                    f"Provided index {idx} not found in project '{d['ref_proj']}' '{d['file']}'.",
+                    f"Provided index not found in project '{d['ref_proj']}' file {d['file']}.",
                     input_type="error",
                 )
             )

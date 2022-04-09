@@ -39,8 +39,8 @@ def main():
     )
     d = vars(parser.parse_args())
 
-    from_idx = define_idx(d["from"])
-    to_idx = define_idx(d["to"])
+    from_idx = define_idx(d["from"], project_list)
+    to_idx = define_idx(d["to"], project_list)
     proj_to_move = project_list[from_idx]
     del project_list[from_idx]
     project_list.insert(to_idx, proj_to_move)

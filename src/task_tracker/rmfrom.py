@@ -87,7 +87,14 @@ def main():
                 input_type="error",
             )
         )
-    d["pos"] = [define_idx(i) for i in d["pos"]]
+
+    file_name = process_file(d["file"])
+
+    base_path = f"{data_path}/projects/{d['ref_proj']}"
+    path = f"{base_path}/{file_name}.csv"
+    df = pd.read_csv(path)
+
+    d["pos"] = [define_idx(i,df) for i in d["pos"]]
     if len(set(d["pos"])) != len(d["pos"]):
         warnings.warn(
             reformat(
@@ -97,11 +104,6 @@ def main():
         )
     d["pos"] = list(dict.fromkeys(d["pos"]))
 
-    file_name = process_file(d["file"])
-
-    base_path = f"{data_path}/projects/{d['ref_proj']}"
-    path = f"{base_path}/{file_name}.csv"
-    df = pd.read_csv(path)
     for idx in d["pos"]:
         if idx not in list(df.index):
             raise ValueError(

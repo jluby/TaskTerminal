@@ -244,11 +244,11 @@ def parse_description(df_row: pd.DataFrame) -> list:
     return [""] + parse_row(f"{df_row['description']}") + [""]
 
 
-def define_idx(pos) -> int:
+def define_idx(pos:int, ref_obj) -> int:
     if pos == "HEAD":
         return 0
     elif pos == "TAIL":
-        return -1
+        return len(ref_obj)-1
     else:
         return int(pos)
 

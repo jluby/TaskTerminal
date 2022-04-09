@@ -95,10 +95,11 @@ def main():
 
     file = process_file(d["file"])
 
-    from_idx = define_idx(d["from"])
-    to_idx = define_idx(d["to"])
     path = f"{data_path}/projects/{d['ref_proj']}/{file}.csv"
     df = pd.read_csv(path)
+
+    from_idx = define_idx(d["from"], df)
+    to_idx = define_idx(d["to"], df)
     df = move(df, from_index=from_idx, to_index=to_idx)
     df.to_csv(path, index=False)
     print(

@@ -120,7 +120,7 @@ def main(parse_args=True):
         if d["pos"] is None:
             lines = parse_entries(df, project=proj, file=file, width=WIDTH)
         else:
-            idx = define_idx(d["pos"])
+            idx = define_idx(d["pos"], df)
             if idx not in list(df.index):
                 raise ValueError(
                     reformat(
