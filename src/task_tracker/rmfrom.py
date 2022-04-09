@@ -15,13 +15,13 @@ from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
+    file_options,
     halftab,
     pkg_path,
+    process_file,
     reformat,
     set_entry_size,
     timed_sleep,
-    file_options,
-    process_file
 )
 
 # establish parameters
@@ -94,7 +94,7 @@ def main():
     path = f"{base_path}/{file_name}.csv"
     df = pd.read_csv(path)
 
-    d["pos"] = [define_idx(i,df) for i in d["pos"]]
+    d["pos"] = [define_idx(i, df) for i in d["pos"]]
     if len(set(d["pos"])) != len(d["pos"]):
         warnings.warn(
             reformat(
@@ -115,7 +115,12 @@ def main():
         iloc = df.index.get_loc(idx)
         to_be_removed = df.iloc[iloc]
         q_str = halftab + "Remove the below entry? (y/n)"
-        set_entry_size(to_be_removed, min_width=len(q_str)+1, additional_width=23, max_width=72)
+        set_entry_size(
+            to_be_removed,
+            min_width=len(q_str) + 1,
+            additional_width=23,
+            max_width=72,
+        )
         confirmed = input(
             f"\n{q_str}\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
         )

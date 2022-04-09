@@ -18,20 +18,20 @@ from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
+    file_options,
     halftab,
     pkg_path,
+    process_file,
     reformat,
     set_entry_size,
     timed_sleep,
-    process_file,
-    file_options,
     transfer_row,
-    define_chain
 )
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
+
 
 def main():
     check_init()
@@ -71,10 +71,14 @@ def main():
     if not d["ref_proj"] or not d["pos"]:
         raise ValueError(
             reformat(
-                f"'ref_proj' and at least one 'pos' must be provided.", input_type="error"
+                f"'ref_proj' and at least one 'pos' must be provided.",
+                input_type="error",
             )
         )
-    if not all(x in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)] for x in d["pos"]):
+    if not all(
+        x in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]
+        for x in d["pos"]
+    ):
         raise ValueError(
             reformat(
                 f"'pos' entries must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100",
@@ -104,20 +108,27 @@ def main():
         )
 
     d["file"] = process_file(d["file"])
-    chain = define_chain(d["file"])
 
-    file_idx = chain.index(d["file"])
     end_of_chain = False
     if not d["U"]:
-        if file_idx == len(chain):
-            raise ValueError(reformat("No 'send_to' file found in 'config.json'. Cannot perform pull.", input_type="error"))
-        to_file = chain[file_idx + 1]
-        end_of_chain = file_idx + 2 == len(chain)
+        if "send_to" not in CONFIG[d["file"]].keys():
+            raise ValueError(
+                reformat(
+                    "No 'send_to' file found in 'config.json'. Cannot perform pull.",
+                    input_type="error",
+                )
+            )
+        to_file = CONFIG[d["file"]]["send_to"]
     else:
-        if file_idx == 0:
-            raise ValueError(reformat("No sender file found in 'config.json'. Cannot perform push.", input_type="error"))
-        to_file = chain[chain.index(d["file"]) - 1]
-    
+        if "push_to" not in CONFIG[d["file"]].keys():
+            raise ValueError(
+                reformat(
+                    "No 'push_to' file found in 'config.json'. Cannot perform push.",
+                    input_type="error",
+                )
+            )
+        to_file = CONFIG[d["file"]]["push_to"]
+
     from_path = f"{data_path}/projects/{d['ref_proj']}/{d['file']}.csv"
     to_path = f"{data_path}/projects/{d['ref_proj']}/{to_file}.csv"
     from_df = pd.read_csv(from_path)
@@ -132,8 +143,8 @@ def main():
             )
         )
     d["pos"] = list(dict.fromkeys(d["pos"]))
-    
-    for idx in d['pos']:
+
+    for idx in d["pos"]:
         if idx not in list(from_df.index):
             raise ValueError(
                 reformat(
@@ -145,14 +156,19 @@ def main():
         to_be_moved = from_df.iloc[iloc]
         m_str = "Pull" if not d["U"] else "Push"
         q_str = halftab + f"{m_str} the below entry? (y/n)"
-        set_entry_size(to_be_moved, additional_height=5, min_width=len(q_str)+1, additional_width=23, max_width=72)
-        confirmed = input(
-            f"\n{q_str}\n\n{to_be_moved}\n{halftab}"
+        set_entry_size(
+            to_be_moved,
+            additional_height=5,
+            min_width=len(q_str) + 1,
+            additional_width=23,
+            max_width=72,
         )
+        confirmed = input(f"\n{q_str}\n\n{to_be_moved}\n{halftab}")
         while confirmed not in ["y", "Y"] + ["n", "N"]:
             confirmed = input(
                 reformat(
-                    f"Accepted inputs are ['y', 'Y', 'n', 'N'].", input_type="input"
+                    f"Accepted inputs are ['y', 'Y', 'n', 'N'].",
+                    input_type="input",
                 )
             )
         if confirmed in ["y", "Y"]:
@@ -162,16 +178,16 @@ def main():
             if end_of_chain:
                 print(
                     reformat(
-                        colored("-- \u263A Nice job! \u263A --", color="green", attrs=["bold", "blink"])
+                        colored(
+                            "-- \u263A Nice job! \u263A --",
+                            color="green",
+                            attrs=["bold", "blink"],
+                        )
                     )
                 )
                 timed_sleep(2)
             else:
-                print(
-                    reformat(
-                        f"Item moved successfully to {to_file}."
-                    )
-                )
+                print(reformat(f"Item moved successfully to {to_file}."))
                 timed_sleep()
         else:
             print(reformat("Action cancelled."))

@@ -12,20 +12,21 @@ import pandas as pd
 from task_tracker import lst
 
 from .helpers.helpers import (
-    columns,
     CONFIG,
     check_init,
+    columns,
     data_path,
     define_idx,
+    file_options,
     move,
     pkg_path,
-    reformat,
-    timed_sleep,
-    file_options,
     process_file,
     process_name,
-    reformat_date
+    reformat,
+    reformat_date,
+    timed_sleep,
 )
+
 
 def main():
     check_init()
@@ -100,7 +101,7 @@ def main():
     file = process_file(d["file"])
     entry_name = process_name(d["file"])
 
-    entry_dict = {k:None for k in columns}
+    entry_dict = {k: None for k in columns}
 
     path = f"{data_path}/projects/{d['ref_proj']}/{file}.csv"
     df = pd.read_csv(path)
@@ -118,8 +119,12 @@ def main():
         if entry_name != "ref"
         else f"Paste reference below:"
     )
-    entry_dict["description"] = input(reformat(description_str, input_type="input"))
-    entry_dict["datetime_created"] = str(datetime.now().strftime("%m/%d/%Y %H:%M:%S"))
+    entry_dict["description"] = input(
+        reformat(description_str, input_type="input")
+    )
+    entry_dict["datetime_created"] = str(
+        datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+    )
     entry_dict["flagged"] = d["flag"]
 
     if "attrs" in CONFIG[file].keys() and "hours" in CONFIG[file]["attrs"]:
@@ -134,21 +139,33 @@ def main():
                         )
                     )
                 )
-        if ("attrs" in CONFIG[file].keys() and "schedule" in CONFIG[file]["attrs"]) or d["s"]:
+        if (
+            "attrs" in CONFIG[file].keys()
+            and "schedule" in CONFIG[file]["attrs"]
+        ) or d["s"]:
             if "send_to" not in CONFIG[file].keys():
-                raise ValueError(reformat("Cannot schedule an entry to a file with no 'send_to' parameter."))
+                raise ValueError(
+                    reformat(
+                        "Cannot schedule an entry to a file with no 'send_to' parameter."
+                    )
+                )
             scheduled = ""
-            while type(scheduled) is not datetime or not scheduled > datetime.now():
+            while (
+                type(scheduled) is not datetime
+                or not scheduled > datetime.now()
+            ):
                 with suppress(ValueError):
                     scheduled = input(
                         reformat(
                             "When should this be released? (%-m/%-d %H:%M)",
                             input_type="input",
-                            )
+                        )
                     )
                     scheduled = reformat_date(scheduled)
-            entry_dict["datetime_scheduled"] = scheduled.strftime("%m/%d/%Y %H:%M:%S")
-    
+            entry_dict["datetime_scheduled"] = scheduled.strftime(
+                "%m/%d/%Y %H:%M:%S"
+            )
+
     df = df.append(entry_dict, ignore_index=True)
     df = move(df, from_index=-1, to_index=define_idx(d["pos"], df))
     df.to_csv(path, index=False)

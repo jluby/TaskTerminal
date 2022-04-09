@@ -4,11 +4,10 @@
 # base imports
 import argparse
 import json
-
-import pandas as pd
-import numpy as np
-
 from datetime import datetime
+
+import numpy as np
+import pandas as pd
 
 pd.options.mode.chained_assignment = None
 from contextlib import suppress
@@ -20,21 +19,22 @@ from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
+    file_options,
     halftab,
     pkg_path,
-    reformat,
-    set_entry_size,
-    timed_sleep,
-    split_to_width,
-    set_entry_size_manual,
-    file_options,
     process_file,
-    reformat_date
+    reformat,
+    reformat_date,
+    set_entry_size,
+    set_entry_size_manual,
+    split_to_width,
+    timed_sleep,
 )
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
+
 
 def main():
     check_init()
@@ -115,31 +115,69 @@ def main():
             )
         )
     to_be_edited = df.iloc[idx]
-    non_editable = ["datetime_created", "datetime_moved"] if not d["a"] else ["time_estimate", "flagged", "datetime_created", "datetime_moved", "datetime_scheduled"]
+    non_editable = (
+        ["datetime_created", "datetime_moved"]
+        if not d["a"]
+        else [
+            "time_estimate",
+            "flagged",
+            "datetime_created",
+            "datetime_moved",
+            "datetime_scheduled",
+        ]
+    )
     to_be_edited.index = [
-        f"{c} ({i})" if c not in non_editable else c for i, c in enumerate(to_be_edited.index)
+        f"{c} ({i})" if c not in non_editable else c
+        for i, c in enumerate(to_be_edited.index)
     ]
-    q_str = "Which item would you like to edit (enter index)" if not d["a"] else "To which item would you like to append (enter index)"
-    set_entry_size(to_be_edited, min_width=len(q_str)+5, max_width=76, additional_height=5, additional_width=27)
+    q_str = (
+        "Which item would you like to edit (enter index)"
+        if not d["a"]
+        else "To which item would you like to append (enter index)"
+    )
+    set_entry_size(
+        to_be_edited,
+        min_width=len(q_str) + 5,
+        max_width=76,
+        additional_height=5,
+        additional_width=27,
+    )
     val_idx = None
     while not type(val_idx) is int:
         with suppress(ValueError):
             val_idx = int(
-                input(
-                    f"\n{halftab}{q_str}?\n\n{to_be_edited}\n{halftab}"
-                )
+                input(f"\n{halftab}{q_str}?\n\n{to_be_edited}\n{halftab}")
             )
     if to_be_edited.index[val_idx].split(" ")[0] in non_editable:
-        raise ValueError(reformat("Action not permitted for the provided index.", input_type="error"))
+        raise ValueError(
+            reformat(
+                "Action not permitted for the provided index.",
+                input_type="error",
+            )
+        )
     edit_lines = split_to_width(str(to_be_edited[val_idx]), linelen=50)
-    set_entry_size_manual(6+len(edit_lines), np.max([len(l) for l in edit_lines])+10)
-    print(f"\n{halftab}{to_be_edited.index[val_idx].split(' ')[0].capitalize()} was:"); [print(f"{halftab}{l}") for l in edit_lines]; print(f"{halftab}{type(to_be_edited[val_idx])}\n")
+    set_entry_size_manual(
+        6 + len(edit_lines), np.max([len(l) for l in edit_lines]) + 10
+    )
+    print(
+        f"\n{halftab}{to_be_edited.index[val_idx].split(' ')[0].capitalize()} was:"
+    )
+    [print(f"{halftab}{l}") for l in edit_lines]
+    print(f"{halftab}{type(to_be_edited[val_idx])}\n")
     is_date = "datetime" in to_be_edited.index[val_idx]
-    q_str = "What would you like to replace it with?" if not d["a"] else "What would you like to append?"
-    if to_be_edited.index[val_idx][:4] == "desc" and pd.isna(to_be_edited[val_idx]):
+    q_str = (
+        "What would you like to replace it with?"
+        if not d["a"]
+        else "What would you like to append?"
+    )
+    if to_be_edited.index[val_idx][:4] == "desc" and pd.isna(
+        to_be_edited[val_idx]
+    ):
         to_be_edited[val_idx] = ""
     new_value = None
-    while not (type(new_value) == type(to_be_edited[val_idx]) and not is_date) and not ((type(new_value) is datetime) and is_date):
+    while not (
+        type(new_value) == type(to_be_edited[val_idx]) and not is_date
+    ) and not ((type(new_value) is datetime) and is_date):
         with suppress(ValueError):
             new_value = input(
                 reformat(
@@ -152,7 +190,8 @@ def main():
 
             if "datetime" in to_be_edited.index[val_idx]:
                 if new_value in ["NaN", "NA", "na", "nan"]:
-                    new_value = float("NaN"); break
+                    new_value = float("NaN")
+                    break
                 new_value = reformat_date(new_value)
             else:
                 new_value = type(to_be_edited[val_idx])(new_value)

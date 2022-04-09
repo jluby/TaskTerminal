@@ -3,6 +3,7 @@
 
 import argparse
 import json
+
 import pandas as pd
 
 from task_tracker import lst
@@ -12,12 +13,12 @@ from .helpers.helpers import (
     check_init,
     data_path,
     define_idx,
+    file_options,
     move,
     pkg_path,
+    process_file,
     reformat,
     timed_sleep,
-    file_options,
-    process_file
 )
 
 # establish parameters

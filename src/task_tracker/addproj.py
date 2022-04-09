@@ -10,7 +10,14 @@ import pandas as pd
 
 from task_tracker import lst
 
-from .helpers.helpers import check_init, data_path, reformat, timed_sleep, CONFIG, cols
+from .helpers.helpers import (
+    CONFIG,
+    check_init,
+    cols,
+    data_path,
+    reformat,
+    timed_sleep,
+)
 
 
 def main():

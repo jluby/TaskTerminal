@@ -9,18 +9,18 @@ import os
 import pandas as pd
 
 from .helpers.helpers import (
+    CONFIG,
     check_init,
+    check_scheduled,
     data_path,
     define_idx,
+    file_options,
     parse_description,
     parse_entries,
     pkg_path,
-    file_options,
     print_lines,
-    reformat,
     process_file,
-    check_scheduled,
-    CONFIG
+    reformat,
 )
 
 # establish parameters
@@ -29,6 +29,7 @@ project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 hidden_list = json.load(open(f"{data_path}/hidden_project_list.json", "r"))
 project_list = [p for p in project_list if p not in hidden_list]
 WIDTH = 55
+
 
 def main(parse_args=True):
     check_init()
@@ -72,7 +73,9 @@ def main(parse_args=True):
     else:
         d = vars(parser.parse_args([]))
         if os.path.isfile(last_lst_path):
-            last_lst_params = json.load(open(f"{data_path}/last_lst.json", "r"))
+            last_lst_params = json.load(
+                open(f"{data_path}/last_lst.json", "r")
+            )
             d.update(last_lst_params)
 
     if d["pos"] and d["ref_proj"] in ["all", "ALL"]:
@@ -96,7 +99,10 @@ def main(parse_args=True):
                 input_type="error",
             )
         )
-    elif d["ref_proj"] not in project_list and d["ref_proj"] not in ["all", "ALL"]:
+    elif d["ref_proj"] not in project_list and d["ref_proj"] not in [
+        "all",
+        "ALL",
+    ]:
         raise ValueError(
             reformat(
                 f"'{d['ref_proj']}' is not a valid project. Available projects are {project_list} or you may enter 'ALL' to see all projects. To create a new project directory, run {templates['add_template']}.",
@@ -110,13 +116,13 @@ def main(parse_args=True):
         lines = []
         for proj in project_list:
             df = pd.read_csv(f"{data_path}/projects/{proj}/{file}.csv")
-            proj_lines = parse_entries(df, project=proj, file=file, width=WIDTH)
+            proj_lines = parse_entries(
+                df, project=proj, file=file, width=WIDTH
+            )
             lines += proj_lines
         lines += [""]
     else:
-        df = pd.read_csv(
-            f"{data_path}/projects/{d['ref_proj']}/{file}.csv"
-        )
+        df = pd.read_csv(f"{data_path}/projects/{d['ref_proj']}/{file}.csv")
         if d["pos"] is None:
             lines = parse_entries(df, project=proj, file=file, width=WIDTH)
         else:

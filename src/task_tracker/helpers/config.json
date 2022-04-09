@@ -13,6 +13,7 @@
         "aliases": ["b", "back"],
         "stats_from_prev": ["n"],
         "send_to": "tasks",
+        "push_to": "scheduled",
         "file_name": "backburner",
         "attrs": ["hours", "show_total"]
     },
@@ -22,6 +23,7 @@
         "aliases": ["t", "task"],
         "stats_from_prev": ["n", "total"],
         "send_to": "archives",
+        "push_to": "backburner",
         "file_name": "task",
         "attrs": ["hours", "show_total"]
     },
@@ -29,7 +31,8 @@
     {
         "stat": "datetime_moved",
         "aliases": ["a", "archive"],
-        "file_name": "archive"
+        "file_name": "archive",
+        "push_to": "tasks"
     },
     "notes":
     {
