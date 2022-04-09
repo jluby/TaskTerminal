@@ -150,7 +150,7 @@ def main():
             entry_dict["datetime_scheduled"] = scheduled.strftime("%m/%d/%Y %H:%M:%S")
     
     df = df.append(entry_dict, ignore_index=True)
-    df = move(df, from_index=-1, to_index=define_idx(d["pos"]))
+    df = move(df, from_index=-1, to_index=define_idx(d["pos"], df))
     df.to_csv(path, index=False)
     df = pd.read_csv(path)
     print(
