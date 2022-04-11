@@ -109,7 +109,6 @@ def main():
 
     d["file"] = process_file(d["file"])
 
-    end_of_chain = False
     if not d["U"]:
         if "send_to" not in CONFIG[d["file"]].keys():
             raise ValueError(
@@ -175,7 +174,7 @@ def main():
             from_df, to_df = transfer_row(idx, from_df, to_df)
             to_df.to_csv(to_path, index=False)
             from_df.to_csv(from_path, index=False)
-            if end_of_chain:
+            if "sent_to" not in CONFIG[to_file].keys():
                 print(
                     reformat(
                         colored(
