@@ -174,7 +174,7 @@ def main():
             from_df, to_df = transfer_row(idx, from_df, to_df)
             to_df.to_csv(to_path, index=False)
             from_df.to_csv(from_path, index=False)
-            if "sent_to" not in CONFIG[to_file].keys():
+            if "send_to" not in CONFIG[to_file].keys():
                 print(
                     reformat(
                         colored(
