@@ -282,10 +282,7 @@ def process_rowlines(idx, row, width, file):
 
 
 def process_date_str(date_str: str) -> str:
-    print(date_str)
-    print(type(date_str))
     s = f"{date_str[:10]}".replace(" 0", " ").replace("/0", "/")
-    print(s, len(s))
     return s
 
 
