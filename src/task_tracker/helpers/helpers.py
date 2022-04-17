@@ -290,7 +290,7 @@ def process_date_str(date_str: str) -> str:
 
 
 def parse_description(df_row: pd.DataFrame) -> list:
-    return [""] + parse_row(f"{df_row['description']}") + [""]
+    return [""] + parse_row(f"{df_row['description']}", linelen=50) + [""]
 
 
 def define_idx(pos: int, ref_obj) -> int:

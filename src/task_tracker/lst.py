@@ -9,7 +9,6 @@ import os
 import pandas as pd
 
 from .helpers.helpers import (
-    CONFIG,
     check_init,
     check_scheduled,
     data_path,

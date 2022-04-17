@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Move item from backburner to active list or vice versa."""
 
-# TODO: make format and push up to git
-
 # base imports
 import argparse
 import json
