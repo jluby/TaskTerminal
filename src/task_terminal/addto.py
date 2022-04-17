@@ -9,7 +9,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from task_tracker import lst
+from task_terminal import lst
 
 from .helpers.helpers import (
     CONFIG,
@@ -143,10 +143,10 @@ def main():
             "attrs" in CONFIG[file].keys()
             and "schedule" in CONFIG[file]["attrs"]
         ) or d["s"]:
-            if "send_to" not in CONFIG[file].keys():
+            if "pull_to" not in CONFIG[file].keys():
                 raise ValueError(
                     reformat(
-                        "Cannot schedule an entry to a file with no 'send_to' parameter."
+                        "Cannot schedule an entry to a file with no 'pull_to' parameter."
                     )
                 )
             scheduled = ""

@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="task_tracker",
+    name="task_terminal",
     version="0.0.0a0",
     author="Jack Luby",
     author_email="jack.o.luby@gmail.com",
@@ -24,6 +24,6 @@ setuptools.setup(
     package_data={'': ['helpers/templates.json', 'helpers/config.json']},
     include_package_data=True,
     entry_points={
-    'console_scripts': [f'{file[:-3]} = task_tracker.{file[:-3]}:main' for file in os.listdir("src/task_tracker") if file[-3:] == ".py"]
+    'console_scripts': [f'{file[:-3]} = task_terminal.{file[:-3]}:main' for file in os.listdir("src/task_terminal") if file[-3:] == ".py"]
     }
 )

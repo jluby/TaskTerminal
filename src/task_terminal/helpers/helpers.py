@@ -114,7 +114,7 @@ def transfer_row(idx, from_df, to_df):
 def check_scheduled(project_list=project_list):
 
     chain_files = [
-        file for file in CONFIG.keys() if "send_to" in CONFIG[file].keys()
+        file for file in CONFIG.keys() if "pull_to" in CONFIG[file].keys()
     ]
 
     moves = {k: 0 for k in project_list}
@@ -122,7 +122,7 @@ def check_scheduled(project_list=project_list):
         for file in chain_files:
             from_path = f"{data_path}/projects/{project}/{file}.csv"
             to_path = (
-                f"{data_path}/projects/{project}/{CONFIG[file]['send_to']}.csv"
+                f"{data_path}/projects/{project}/{CONFIG[file]['pull_to']}.csv"
             )
             from_df = pd.read_csv(from_path)
             to_df = pd.read_csv(to_path)
@@ -357,8 +357,8 @@ def define_chain(file: str) -> list:
 
     def fill_next(file, chain):
         chain += [file]
-        if "send_to" in CONFIG[file].keys():
-            return fill_next(CONFIG[file]["send_to"], chain)
+        if "pull_to" in CONFIG[file].keys():
+            return fill_next(CONFIG[file]["pull_to"], chain)
 
         return chain
 
@@ -372,7 +372,7 @@ def get_prev(file):
     senders = [
         f
         for f in CONFIG.keys()
-        if "send_to" in CONFIG[f].keys() and CONFIG[f]["send_to"] == file
+        if "pull_to" in CONFIG[f].keys() and CONFIG[f]["pull_to"] == file
     ]
     if len(senders) > 1:
         warnings.warn(

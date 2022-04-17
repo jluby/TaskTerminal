@@ -9,7 +9,7 @@ import warnings
 import pandas as pd
 from termcolor import colored
 
-from task_tracker import lst
+from task_terminal import lst
 
 from .helpers.helpers import (
     CONFIG,
@@ -36,7 +36,7 @@ def main():
 
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(
-        description="Get entry to move from to config 'send_to' file."
+        description="Get entry to move from to config 'pull_to' file."
     )
     parser.add_argument(
         "ref_proj",
@@ -108,14 +108,14 @@ def main():
     d["file"] = process_file(d["file"])
 
     if not d["U"]:
-        if "send_to" not in CONFIG[d["file"]].keys():
+        if "pull_to" not in CONFIG[d["file"]].keys():
             raise ValueError(
                 reformat(
-                    "No 'send_to' file found in 'config.json'. Cannot perform pull.",
+                    "No 'pull_to' file found in 'config.json'. Cannot perform pull.",
                     input_type="error",
                 )
             )
-        to_file = CONFIG[d["file"]]["send_to"]
+        to_file = CONFIG[d["file"]]["pull_to"]
     else:
         if "push_to" not in CONFIG[d["file"]].keys():
             raise ValueError(
@@ -172,7 +172,7 @@ def main():
             from_df, to_df = transfer_row(idx, from_df, to_df)
             to_df.to_csv(to_path, index=False)
             from_df.to_csv(from_path, index=False)
-            if "send_to" not in CONFIG[to_file].keys():
+            if "pull_to" not in CONFIG[to_file].keys():
                 print(
                     reformat(
                         colored(
