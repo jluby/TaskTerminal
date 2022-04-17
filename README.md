@@ -6,7 +6,7 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
  * Flag important entries
  * View / sort lists, including user-provided task descriptions
  * Allow for task pulls along user-specified list chains (e.g. backburner -> tasks (active) -> archives)
-    * Additionally, allow for movement across chain to be scheduled
+    * Additionally, allow for movement across chains to be scheduled by the user
  * Allow for fully extensible user-specification of list naming and relationships (i.e. list-level 'pull_to' and 'push_to' locations)
  * Store completed tasks (with creation / completion dates) to project-specific dataframe, for easy future reference
 
