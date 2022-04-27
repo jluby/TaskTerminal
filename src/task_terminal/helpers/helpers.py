@@ -212,7 +212,8 @@ def parse_entries(
     lines.append("-" * width)
 
     stats_str, hour_str = get_project_stats(project, file)
-    lines.append(f"{stats_str: <{width-10}}{hour_str: <{10}}")
+    if stats_str or hour_str:
+        lines.append(f"{stats_str: <{width-10}}{hour_str: <{10}}")
 
     return lines
 
@@ -233,7 +234,7 @@ def get_project_stats(project, file):
         lst_stats = ["0"] if list(set(lst_stats)) == ["0"] else lst_stats
         stats_str = f"<- {' | '.join(lst_stats)}" if len(lst_stats) > 0 else ""
 
-    if "attrs" in CONFIG[file].keys() and "hours" in CONFIG[file]["attrs"]:
+    if "attrs" in CONFIG[file].keys() and "show_total" in CONFIG[file]["attrs"]:
         current_df = pd.read_csv(f"{data_path}/projects/{project}/{file}.csv")
         p_hours = (
             np.nansum(current_df["time_estimate"])
