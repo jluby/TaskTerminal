@@ -234,7 +234,10 @@ def get_project_stats(project, file):
         lst_stats = ["0"] if list(set(lst_stats)) == ["0"] else lst_stats
         stats_str = f"<- {' | '.join(lst_stats)}" if len(lst_stats) > 0 else ""
 
-    if "attrs" in CONFIG[file].keys() and "show_total" in CONFIG[file]["attrs"]:
+    if (
+        "attrs" in CONFIG[file].keys()
+        and "show_total" in CONFIG[file]["attrs"]
+    ):
         current_df = pd.read_csv(f"{data_path}/projects/{project}/{file}.csv")
         p_hours = (
             np.nansum(current_df["time_estimate"])
