@@ -19,6 +19,7 @@ from .helpers.helpers import (
     process_file,
     reformat,
     timed_sleep,
+    transfer_row,
 )
 
 # establish parameters
@@ -55,7 +56,7 @@ def main():
         "to",
         type=str,
         nargs="?",
-        help="Index to which item should be moved.",
+        help="Index or file to which item should be moved.",
     )
     d = vars(parser.parse_args())
 
@@ -84,28 +85,51 @@ def main():
                 input_type="error",
             )
         )
-    if not set([d["to"], d["from"]]).issubset(
-        [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]
-    ):
+    if d["from"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
         raise ValueError(
             reformat(
-                "'from' and 'to' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.",
+                f"'from' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.",
                 input_type="error",
             )
         )
+    send_to_file = False
+    if d["to"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
+        try:
+            d["to"] = process_file(d["to"])
+            send_to_file = True
+        except:
+            raise ValueError(
+                reformat(
+                    f"'to' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100 OR be an existing project in {project_list}.",
+                    input_type="error",
+                )
+            )
 
-    file = process_file(d["file"])
+    if not send_to_file:
+        file = process_file(d["file"])
 
-    path = f"{data_path}/projects/{d['ref_proj']}/{file}.csv"
-    df = pd.read_csv(path)
+        path = f"{data_path}/projects/{d['ref_proj']}/{file}.csv"
+        df = pd.read_csv(path)
 
-    from_idx = define_idx(d["from"], df)
-    to_idx = define_idx(d["to"], df)
-    df = move(df, from_index=from_idx, to_index=to_idx)
-    df.to_csv(path, index=False)
-    print(
-        reformat(f"Entry {from_idx} successfully moved to position {to_idx}.")
-    )
+        from_idx = define_idx(d["from"], df)
+        to_idx = define_idx(d["to"], df)
+        df = move(df, from_index=from_idx, to_index=to_idx)
+        df.to_csv(path, index=False)
+        print(
+            reformat(f"Entry {from_idx} successfully moved to position {to_idx}.")
+        )
+    else:
+        from_file = process_file(d["file"])
+        from_path = f"{data_path}/projects/{d['ref_proj']}/{from_file}.csv"
+        to_path = f"{data_path}/projects/{d['ref_proj']}/{d['to']}.csv"
+        from_df = pd.read_csv(from_path)
+        to_df = pd.read_csv(to_path)
+
+        from_idx = define_idx(d["from"], from_df)
+        from_df, to_df = transfer_row(from_idx, from_df, to_df)
+        to_df.to_csv(to_path, index=False)
+        from_df.to_csv(from_path, index=False)
+        print(reformat(f"{d['file']} item {from_idx} moved successfully to {d['to']}."))
 
     timed_sleep()
     lst.main(parse_args=False)

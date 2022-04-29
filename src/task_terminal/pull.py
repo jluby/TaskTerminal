@@ -149,45 +149,22 @@ def main():
                     input_type="error",
                 )
             )
-        iloc = from_df.index.get_loc(idx)
-        to_be_moved = from_df.iloc[iloc]
-        m_str = "Pull" if not d["U"] else "Push"
-        q_str = halftab + f"{m_str} the below entry? (y/n)"
-        set_entry_size(
-            to_be_moved,
-            additional_height=5,
-            min_width=len(q_str) + 1,
-            additional_width=23,
-            max_width=72,
-        )
-        confirmed = input(f"\n{q_str}\n\n{to_be_moved}\n{halftab}")
-        while confirmed not in ["y", "Y"] + ["n", "N"]:
-            confirmed = input(
+        from_df, to_df = transfer_row(idx, from_df, to_df)
+        to_df.to_csv(to_path, index=False)
+        from_df.to_csv(from_path, index=False)
+        if "pull_to" not in CONFIG[to_file].keys():
+            print(
                 reformat(
-                    f"Accepted inputs are ['y', 'Y', 'n', 'N'].",
-                    input_type="input",
-                )
-            )
-        if confirmed in ["y", "Y"]:
-            from_df, to_df = transfer_row(idx, from_df, to_df)
-            to_df.to_csv(to_path, index=False)
-            from_df.to_csv(from_path, index=False)
-            if "pull_to" not in CONFIG[to_file].keys():
-                print(
-                    reformat(
-                        colored(
-                            "-- \u263A Nice job! \u263A --",
-                            color="green",
-                            attrs=["bold", "blink"],
-                        )
+                    colored(
+                        "-- \u263A Nice job! \u263A --",
+                        color="green",
+                        attrs=["bold", "blink"],
                     )
                 )
-                timed_sleep(2)
-            else:
-                print(reformat(f"Item moved successfully to {to_file}."))
-                timed_sleep()
+            )
+            timed_sleep(2)
         else:
-            print(reformat("Action cancelled."))
+            print(reformat(f"{d['file']} item {idx} moved successfully to {to_file}."))
             timed_sleep()
 
     lst.main(parse_args=False)
