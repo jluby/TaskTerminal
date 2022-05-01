@@ -152,6 +152,7 @@ def main():
         from_df, to_df = transfer_row(idx, from_df, to_df)
         to_df.to_csv(to_path, index=False)
         from_df.to_csv(from_path, index=False)
+        print(reformat(f"{d['file']} item {idx} moved successfully to {to_file}."))
         if "pull_to" not in CONFIG[to_file].keys():
             print(
                 reformat(
@@ -164,8 +165,7 @@ def main():
             )
             timed_sleep(2)
         else:
-            print(reformat(f"{d['file']} item {idx} moved successfully to {to_file}."))
-            timed_sleep()
+            timed_sleep(1)
 
     lst.main(parse_args=False)
 
