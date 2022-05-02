@@ -129,7 +129,7 @@ def main():
         from_df, to_df = transfer_row(from_idx, from_df, to_df)
         to_df.to_csv(to_path, index=False)
         from_df.to_csv(from_path, index=False)
-        print(reformat(f"{d['file']} item {from_idx} moved successfully to {d['to']}."))
+        print(reformat(f"{d['file'].capitalize()} item {from_idx} moved successfully to {d['to'].capitalize()}."))
 
     timed_sleep()
     lst.main(parse_args=False)

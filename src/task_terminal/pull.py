@@ -152,7 +152,7 @@ def main():
         from_df, to_df = transfer_row(idx, from_df, to_df)
         to_df.to_csv(to_path, index=False)
         from_df.to_csv(from_path, index=False)
-        print(reformat(f"{d['file'].capitalize()} item {idx} moved successfully to {to_file}."))
+        print(reformat(f"{d['file'].capitalize()} item {idx} moved successfully to {to_file.capitalize()}."))
         if "pull_to" not in CONFIG[to_file].keys():
             print(
                 reformat(
