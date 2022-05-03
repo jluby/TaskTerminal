@@ -313,15 +313,15 @@ def move(df: pd.DataFrame, from_index: int, to_index: int) -> pd.DataFrame:
 
 
 def reformat_date(date_and_time: str):
+    date_and_time = date_and_time.strip()
     if date_and_time[-1] in ["a", "A", "p", "P"]:
         date_and_time += "m"
     if " " in date_and_time:
         date_str, time_str = date_and_time.split(" ")
-    elif not date_and_time[-1] in ["M", "m"]:
-        date_str, time_str = date_and_time, "00:00"
+    elif " " not in date_and_time and not date_and_time[-1] in ["M", "m"]:
+        date_str, time_str = date_and_time, None
     else:
-        date, time_str = dt.today(), date_and_time
-        date_str = None
+        date_str, time_str = None, date_and_time
 
     if date_str:
         if date_str.count("/") == 0:
@@ -336,16 +336,27 @@ def reformat_date(date_and_time: str):
             if datetime.now() > date:
                 date += relativedelta(years=1)
 
-    if ":" in time_str:
-        p = [v.zfill(2) for v in parse("{}:{}", time_str[:-2])]
-        tm = datetime.strptime(
-            f"{p[0]}:{p[1]}{time_str[-2:]}", "%I:%M%p"
-        ).time()
+    if time_str:
+        if ":" in time_str:
+            p = [v.zfill(2) for v in parse("{}:{}", time_str[:-2])]
+            tm = datetime.strptime(
+                f"{p[0]}:{p[1]}{time_str[-2:]}", "%I:%M%p"
+            ).time()
+        else:
+            tm = datetime.strptime(f"{time_str}", "%I%p").time()
     else:
-        tm = datetime.strptime(f"{time_str}", "%I%p").time()
-
-    return datetime.combine(date, tm)
-
+        tm = None
+    
+    if date_str and time_str:
+        return datetime.combine(date, tm)
+    elif date_str:
+        return date
+    else:
+        if tm > datetime.now().time():
+            date = dt.today()
+        else:
+            date = dt.today() + timedelta(days=1)
+        return datetime.combine(date, tm)
 
 def define_chain(file: str) -> list:
     def fill_prev(file, chain):
