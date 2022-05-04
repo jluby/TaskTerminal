@@ -5,6 +5,7 @@ import argparse
 import json
 
 import pandas as pd
+from termcolor import colored
 
 from task_terminal import lst
 
@@ -95,7 +96,7 @@ def main():
     send_to_file = False
     if d["to"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
         try:
-            d["to"] = process_file(d["to"])
+            to_file = process_file(d["to"])
             send_to_file = True
         except:
             raise ValueError(
@@ -121,7 +122,7 @@ def main():
     else:
         from_file = process_file(d["file"])
         from_path = f"{data_path}/projects/{d['ref_proj']}/{from_file}.csv"
-        to_path = f"{data_path}/projects/{d['ref_proj']}/{d['to']}.csv"
+        to_path = f"{data_path}/projects/{d['ref_proj']}/{to_file}.csv"
         from_df = pd.read_csv(from_path)
         to_df = pd.read_csv(to_path)
 
@@ -129,7 +130,18 @@ def main():
         from_df, to_df = transfer_row(from_idx, from_df, to_df)
         to_df.to_csv(to_path, index=False)
         from_df.to_csv(from_path, index=False)
-        print(reformat(f"{d['file'].capitalize()} item {from_idx} moved successfully to {d['to'].capitalize()}."))
+        print(reformat(f"{from_file.capitalize()} item {from_idx} moved successfully to {to_file.capitalize()}."))
+        if "pull_to" not in CONFIG[to_file].keys():
+            print(
+                reformat(
+                    colored(
+                        "-- \u263A Nice job! \u263A --",
+                        color="green",
+                        attrs=["bold", "blink"],
+                    )
+                )
+            )
+            timed_sleep()
 
     timed_sleep()
     lst.main(parse_args=False)
