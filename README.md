@@ -31,7 +31,7 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
 
 <img width="346" alt="config_base" src="https://user-images.githubusercontent.com/43190780/167225525-f6806abc-c1a3-4c5c-b749-08b0f9cc7dc6.png">
 
-  a. NOTE: It is recommended that file types be set prior to establishing task entries. Users should be aware that entries within a given file would likely be lost upon package re-configuration.
+  * NOTE: It is recommended that file types be set prior to establishing task entries. Users should be aware that entries within a given file would likely be lost upon package re-configuration.
  3. Establish file-level attributes. As values paired to their corresponding files, these attributes will be contained in their own dictionary. Available attributes are:
   REQUIRED:
   a. `aliases`: `list` - A list of aliases by which file can be identified in CLI commands. These must be unique to each file.
