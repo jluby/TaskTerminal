@@ -1,5 +1,6 @@
 # base imports
 import json
+from multiprocessing.sharedctypes import Value
 import os
 import time
 import warnings
@@ -162,6 +163,16 @@ def check_init() -> None:
         json.dump([], open(f"{data_path}/project_list.json", "w"))
         json.dump([], open(f"{data_path}/hidden_project_list.json", "w"))
         os.makedirs(f"{data_path}/projects")
+
+    # check that aliases are not duplicated across files
+    aliases = []
+    for d in CONFIG.values():
+        aliases += d["aliases"]
+    unique = set(aliases)
+    for a in unique:
+        aliases.remove(a)
+    if aliases:
+        raise ValueError(f"Alias(es) {aliases} are shared by multiple files. Aliases must be unique to files to avoid ambiguity.")
 
 
 def split_to_width(string: str, linelen: int) -> list:
