@@ -160,7 +160,7 @@ def main():
     df = pd.read_csv(path)
     print(
         reformat(
-            f"Entry added successfully to {file}.",
+            f"Entry added successfully to {d['ref_proj']}.",
             input_type=None,
         )
     )
