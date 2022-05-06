@@ -49,8 +49,8 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
    
   A fully established `config.json` file might look something like this:
   
-  <img width="294" alt="config" src="https://user-images.githubusercontent.com/43190780/167222415-f4de7eb5-7233-43e3-a5e1-c68c2ec06599.png">
-   
+<img width="372" alt="full_config" src="https://user-images.githubusercontent.com/43190780/167225752-f7e63a9b-cfe2-4028-b4c9-ca159e68579e.png">
+
  3. Re-install the package with `pip install .` to establish configuration options.
 
 ## Usage
