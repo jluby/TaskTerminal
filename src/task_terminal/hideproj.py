@@ -50,7 +50,7 @@ def main():
             reformat("Project name must be provided.", input_type="error")
             + helper_str
         )
-    ref_ls = project_list if not d["u"] else hidden_list
+    ref_ls = project_list if not d["U"] else hidden_list
     if d["project"] not in ref_ls:
         raise ValueError(
             reformat(
@@ -59,7 +59,7 @@ def main():
             + helper_str
         )
 
-    if not d["u"]:
+    if not d["U"]:
         hidden_list.append(d["project"])
         project_list.remove(d["project"])
     else:
@@ -67,7 +67,7 @@ def main():
         hidden_list.append(d["project"])
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
     json.dump(hidden_list, open(f"{data_path}/hidden_project_list.json", "w"))
-    type_str = "added to" if not d["u"] else "removed from"
+    type_str = "added to" if not d["U"] else "removed from"
     print(
         reformat(
             f"Project {d['project']} successfully {type_str} hidden list."
