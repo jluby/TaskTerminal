@@ -21,7 +21,6 @@ from .helpers.helpers import (
     move,
     pkg_path,
     process_file,
-    process_name,
     reformat,
     reformat_date,
     timed_sleep,
@@ -99,7 +98,6 @@ def main():
         )
 
     file = process_file(d["file"])
-    entry_name = process_name(d["file"])
 
     entry_dict = {k: None for k in columns}
 
@@ -107,20 +105,10 @@ def main():
     df = pd.read_csv(path)
     entry_dict["entry"] = ""
     entry_dict["description"] = ""
-    entry_str = (
-        f"Provide {entry_name} entry:"
-        if entry_name != "ref"
-        else f"Provide {entry_name} description:"
-    )
     while entry_dict["entry"] == "":
-        entry_dict["entry"] = input(reformat(entry_str, input_type="input"))
-    description_str = (
-        f"Describe {entry_name} entry:"
-        if entry_name != "ref"
-        else f"Paste reference below:"
-    )
+        entry_dict["entry"] = input(reformat("Provide entry:", input_type="input"))
     entry_dict["description"] = input(
-        reformat(description_str, input_type="input")
+        reformat("Describe entry:", input_type="input")
     )
     entry_dict["datetime_created"] = str(
         datetime.now().strftime("%m/%d/%Y %H:%M:%S")

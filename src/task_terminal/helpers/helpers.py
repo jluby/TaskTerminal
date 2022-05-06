@@ -93,12 +93,6 @@ def process_file(filename: str):
                 return file
     raise ValueError(f"File {filename} not found in file names or aliases.")
 
-
-def process_name(filename: str):
-    file = process_file(filename)
-    return CONFIG[file]["file_name"]
-
-
 def transfer_row(idx, from_df, to_df):
     iloc = from_df.index.get_loc(idx)
     to_be_moved = from_df.iloc[iloc]
