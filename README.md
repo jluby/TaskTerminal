@@ -29,8 +29,8 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
  List types and relationships are configurable via the package's `config.json` file. To configure, follow these steps:
  1. Establish desired file types. These will be the keys of the configuration directory.
 
- <img width="293" alt="config_base" src="https://user-images.githubusercontent.com/43190780/167225102-5ab38fc7-236f-4463-b28b-fd0fd36a03ce.png">
-  
+<img width="346" alt="config_base" src="https://user-images.githubusercontent.com/43190780/167225525-f6806abc-c1a3-4c5c-b749-08b0f9cc7dc6.png">
+
   a. NOTE: It is recommended that file types be set prior to establishing task entries. Users should be aware that entries within a given file would likely be lost upon package re-configuration.
  3. Establish file-level attributes. As values paired to their corresponding files, these attributes will be contained in their own dictionary. Available attributes are:
   REQUIRED:
