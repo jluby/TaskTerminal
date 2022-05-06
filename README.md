@@ -1,6 +1,6 @@
 # TaskTerminal - Task Tracking and Management with Command Line Tools and Basic Automation
 
-<img width="402" alt="sample_terminal" src="https://user-images.githubusercontent.com/43190780/167225375-6d541da9-8466-4b61-8f93-acf0f5d4483f.png">
+<img width="402" alt="sample_terminal" src="https://user-images.githubusercontent.com/43190780/167225457-bf7e1848-a7cf-452d-bbd0-79483d4eec3d.png">
 
 ## Project Overview
 This project seeks to provide utilities for task tracking. Tasks are seperated by project. The core utilities of this project are:
