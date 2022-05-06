@@ -1,4 +1,5 @@
-# TaskTerminal - Task Tracking and Management with Command Line Tools and Basic Automation
+# TaskTerminal
+## Task Tracking and Management with Command Line Tools and Basic Automation
 
 <img width="402" alt="sample_terminal" src="https://user-images.githubusercontent.com/43190780/167225457-bf7e1848-a7cf-452d-bbd0-79483d4eec3d.png">
 
