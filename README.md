@@ -6,11 +6,11 @@
 ## Project Overview
 This project seeks to provide utilities for task tracking. Tasks are seperated by project. The core utilities of this project are:
  * Create entries then store to project-specific, user-specified lists
- * Flag important entries
  * View / sort lists, including user-provided task descriptions
  * Allow for task pulls along user-specified list chains (e.g. backburner -> tasks (active) -> archives)
   * Additionally, allow for movement across chains to be scheduled by the user
  * Allow for fully extensible user-specification of list naming and relationships (i.e. list-level 'pull_to' and 'push_to' locations)
+ * Flag important entries
 
 ## Repository Structure
  * `/src/task_terminal`: `task_terminal` package, contains CLI scripts and helpers.
