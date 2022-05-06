@@ -40,7 +40,7 @@ def main():
     check_init()
 
     # establish parser to pull in projects to view
-    parser = argparse.ArgumentParser(description="Get entries to remove.")
+    parser = argparse.ArgumentParser(description="Edit list item.")
     parser.add_argument(
         "ref_proj",
         type=str,

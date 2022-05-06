@@ -23,7 +23,7 @@ def main():
 
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(
-        description="Get project or entry to move."
+        description="Move project to a new priority position."
     )
     parser.add_argument(
         "from",

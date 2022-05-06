@@ -28,7 +28,7 @@ def main():
     check_init()
 
     # establish parser to pull in projects to view
-    parser = argparse.ArgumentParser(description="Get project to delete.")
+    parser = argparse.ArgumentParser(description="Delete project.")
     parser.add_argument(
         "project",
         type=str,

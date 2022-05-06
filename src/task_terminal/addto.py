@@ -36,7 +36,7 @@ def main():
     project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 
     # establish parser to pull in projects to view
-    parser = argparse.ArgumentParser(description="Get entries to add.")
+    parser = argparse.ArgumentParser(description="Add item to list.")
     parser.add_argument(
         "ref_proj",
         type=str,

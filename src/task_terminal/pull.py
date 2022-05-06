@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Move item from backburner to active list or vice versa."""
+"""Move item to list's 'pull_to' location if -U not specified, or to 'push_to' location if -U is specified."""
 
 # base imports
 import argparse
@@ -36,7 +36,7 @@ def main():
 
     # establish parser to pull in projects to view
     parser = argparse.ArgumentParser(
-        description="Get entry to move from to config 'pull_to' file."
+        description="Move item to list's 'pull_to' location if -U not specified, or to 'push_to' location if -U is specified."
     )
     parser.add_argument(
         "ref_proj",
@@ -62,7 +62,7 @@ def main():
         "-U",
         action=argparse.BooleanOptionalAction,
         default=False,
-        help="If provided, reverse movement.",
+        help="If provided, send to 'push_to' location.",
     )
     d = vars(parser.parse_args())
 

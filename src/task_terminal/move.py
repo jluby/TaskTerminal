@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Move item in list to another position."""
+"""Move item in list to another position or to tail of another list."""
 
 import argparse
 import json
@@ -32,20 +32,20 @@ def main():
     check_init()
 
     # establish parser to pull in projects to view
-    parser = argparse.ArgumentParser(description="Get entry to move.")
+    parser = argparse.ArgumentParser(description="Move item in list to another position or to tail of another list.")
     parser.add_argument(
         "ref_proj",
         type=str,
         nargs="?",
         choices=project_list,
-        help="Project in which entry will be moved.",
+        help="Project in which entry to be moved resides.",
     )
     parser.add_argument(
         "file",
         type=str,
         nargs="?",
         choices=file_options,
-        help="List in which entry will be moved.",
+        help="List in which entry to be moved resides.",
     )
     parser.add_argument(
         "from",

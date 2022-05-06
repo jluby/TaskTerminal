@@ -26,7 +26,7 @@ def main():
     check_init()
 
     # establish parser to pull in projects to view
-    parser = argparse.ArgumentParser(description="Get project to hide.")
+    parser = argparse.ArgumentParser(description="Create a hidden project list so that currently dead projects are not printed on 'show' calls.")
     parser.add_argument(
         "-u",
         action=argparse.BooleanOptionalAction,
