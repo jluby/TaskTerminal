@@ -160,7 +160,7 @@ def main():
     df = pd.read_csv(path)
     print(
         reformat(
-            f"{entry_name.capitalize()} added successfully.",
+            f"Entry added successfully to {file}.",
             input_type=None,
         )
     )
