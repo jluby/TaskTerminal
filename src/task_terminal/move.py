@@ -32,7 +32,9 @@ def main():
     check_init()
 
     # establish parser to pull in projects to view
-    parser = argparse.ArgumentParser(description="Move item in list to another position or to tail of another list.")
+    parser = argparse.ArgumentParser(
+        description="Move item in list to another position or to tail of another list."
+    )
     parser.add_argument(
         "ref_proj",
         type=str,
@@ -117,7 +119,9 @@ def main():
         df = move(df, from_index=from_idx, to_index=to_idx)
         df.to_csv(path, index=False)
         print(
-            reformat(f"Entry {from_idx} successfully moved to position {to_idx}.")
+            reformat(
+                f"Entry {from_idx} successfully moved to position {to_idx}."
+            )
         )
     else:
         from_file = process_file(d["file"])
@@ -130,7 +134,11 @@ def main():
         from_df, to_df = transfer_row(from_idx, from_df, to_df)
         to_df.to_csv(to_path, index=False)
         from_df.to_csv(from_path, index=False)
-        print(reformat(f"{from_file.capitalize()} item {from_idx} moved successfully to {to_file.capitalize()}."))
+        print(
+            reformat(
+                f"{from_file.capitalize()} item {from_idx} moved successfully to {to_file.capitalize()}."
+            )
+        )
         if "pull_to" not in CONFIG[to_file].keys():
             print(
                 reformat(

@@ -1,11 +1,11 @@
 # base imports
 import json
-from multiprocessing.sharedctypes import Value
 import os
 import time
 import warnings
 from datetime import date as dt
 from datetime import datetime, timedelta
+from multiprocessing.sharedctypes import Value
 from pathlib import Path
 
 import numpy as np
@@ -93,6 +93,7 @@ def process_file(filename: str):
                 return file
     raise ValueError(f"File {filename} not found in file names or aliases.")
 
+
 def transfer_row(idx, from_df, to_df):
     iloc = from_df.index.get_loc(idx)
     to_be_moved = from_df.iloc[iloc]
@@ -166,7 +167,9 @@ def check_init() -> None:
     for a in unique:
         aliases.remove(a)
     if aliases:
-        raise ValueError(f"Alias(es) {aliases} are shared by multiple files. Aliases must be unique to files to avoid ambiguity.")
+        raise ValueError(
+            f"Alias(es) {aliases} are shared by multiple files. Aliases must be unique to files to avoid ambiguity."
+        )
 
 
 def split_to_width(string: str, linelen: int) -> list:
@@ -351,7 +354,7 @@ def reformat_date(date_and_time: str):
             tm = datetime.strptime(f"{time_str}", "%I%p").time()
     else:
         tm = None
-    
+
     if date_str and time_str:
         return datetime.combine(date, tm)
     elif date_str:
@@ -362,6 +365,7 @@ def reformat_date(date_and_time: str):
         else:
             date = dt.today() + timedelta(days=1)
         return datetime.combine(date, tm)
+
 
 def define_chain(file: str) -> list:
     def fill_prev(file, chain):

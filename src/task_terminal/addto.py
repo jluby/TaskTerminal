@@ -106,7 +106,9 @@ def main():
     entry_dict["entry"] = ""
     entry_dict["description"] = ""
     while entry_dict["entry"] == "":
-        entry_dict["entry"] = input(reformat("Provide entry:", input_type="input"))
+        entry_dict["entry"] = input(
+            reformat("Provide entry:", input_type="input")
+        )
     entry_dict["description"] = input(
         reformat("Describe entry:", input_type="input")
     )

@@ -35,7 +35,9 @@ def main(parse_args=True):
     check_scheduled()
 
     # establish parser to pull in projects to view
-    parser = argparse.ArgumentParser(description="Display contents of list or entry.")
+    parser = argparse.ArgumentParser(
+        description="Display contents of list or entry."
+    )
     parser.add_argument(
         "ref_proj",
         type=str,
