@@ -13,7 +13,7 @@ from task_terminal import lst
 from .helpers.helpers import (
     CONFIG,
     check_init,
-    cols,
+    columns,
     data_path,
     reformat,
     timed_sleep,
@@ -51,7 +51,7 @@ def main():
 
     os.makedirs(base_path)
     for file in CONFIG.keys():
-        pd.DataFrame(columns=cols).to_csv(
+        pd.DataFrame(columns=columns).to_csv(
             f"{base_path}/{file}.csv", index=False
         )
 
