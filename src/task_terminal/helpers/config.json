@@ -1,15 +1,15 @@
 {
     "scheduled": 
     {
-        "stat": "datetime_scheduled",
         "aliases": ["s", "schedule"],
+        "stat": "datetime_scheduled",
         "pull_to": "tasks",
         "attrs": ["hours", "schedule"]
     },
     "backburner": 
     {
-        "stat": "time_estimate",
         "aliases": ["b", "back"],
+        "stat": "time_estimate",
         "stats_from_prev": ["n"],
         "pull_to": "tasks",
         "push_to": "scheduled",
@@ -17,8 +17,8 @@
     },
     "tasks":
     {
-        "stat": "time_estimate",
         "aliases": ["t", "task"],
+        "stat": "time_estimate",
         "stats_from_prev": ["n", "total"],
         "pull_to": "archives",
         "push_to": "backburner",
@@ -26,8 +26,8 @@
     },
     "archives":
     {
-        "stat": "datetime_moved",
         "aliases": ["a", "archive"],
+        "stat": "datetime_moved",
         "push_to": "tasks"
     },
     "notes":
@@ -39,3 +39,6 @@
         "aliases": ["r", "ref"]
     }
 }
+
+
+
