@@ -64,13 +64,13 @@ def main():
         help="If provided, flag as important.",
     )
     parser.add_argument(
-        "-d",
+        "-desc",
         action=argparse.BooleanOptionalAction,
         default=False,
         help="If provided, give a description for the entry.",
     )
     parser.add_argument(
-        "-s",
+        "-schedule",
         action=argparse.BooleanOptionalAction,
         default=False,
         help="If provided, explicitly schedule movement.",
@@ -115,7 +115,7 @@ def main():
         entry_dict["entry"] = input(
             reformat("Provide entry:", input_type="input")
         )
-    if d["d"]:
+    if d["desc"]:
         entry_dict["description"] = input(
             reformat("Describe entry:", input_type="input")
         )
@@ -139,7 +139,7 @@ def main():
         if (
             "attrs" in CONFIG[file].keys()
             and "schedule" in CONFIG[file]["attrs"]
-        ) or d["s"]:
+        ) or d["schedule"]:
             if "pull_to" not in CONFIG[file].keys():
                 raise ValueError(
                     reformat(

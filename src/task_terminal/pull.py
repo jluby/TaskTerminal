@@ -17,11 +17,9 @@ from .helpers.helpers import (
     data_path,
     define_idx,
     file_options,
-    halftab,
     pkg_path,
     process_file,
     reformat,
-    set_entry_size,
     timed_sleep,
     transfer_row,
 )
