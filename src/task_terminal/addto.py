@@ -64,6 +64,12 @@ def main():
         help="If provided, flag as important.",
     )
     parser.add_argument(
+        "-d",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="If provided, give a description for the entry.",
+    )
+    parser.add_argument(
         "-s",
         action=argparse.BooleanOptionalAction,
         default=False,
@@ -109,9 +115,10 @@ def main():
         entry_dict["entry"] = input(
             reformat("Provide entry:", input_type="input")
         )
-    entry_dict["description"] = input(
-        reformat("Describe entry:", input_type="input")
-    )
+    if d["d"]:
+        entry_dict["description"] = input(
+            reformat("Describe entry:", input_type="input")
+        )
     entry_dict["datetime_created"] = str(
         datetime.now().strftime("%m/%d/%Y %H:%M:%S")
     )
