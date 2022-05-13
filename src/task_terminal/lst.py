@@ -22,15 +22,15 @@ from .helpers.helpers import (
     reformat,
 )
 
-# establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
-project_list = json.load(open(f"{data_path}/project_list.json", "r"))
-hidden_list = json.load(open(f"{data_path}/hidden_project_list.json", "r"))
-project_list = [p for p in project_list if p not in hidden_list]
 WIDTH = 55
 
-
 def main(parse_args=True):
+
+    # establish parameters
+    project_list = json.load(open(f"{data_path}/project_list.json", "r"))
+    hidden_list = json.load(open(f"{data_path}/hidden_project_list.json", "r"))
+    project_list = [p for p in project_list if p not in hidden_list]
     check_init()
     check_scheduled()
 
