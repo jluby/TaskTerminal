@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Delete item from list."""
+"""
+Delete item from list.
+
+$ rmfrom PROJECT LIST IDX
+"""
 
 # base imports
 import argparse

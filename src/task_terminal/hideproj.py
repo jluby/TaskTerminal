@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Create a hidden project list so that currently dead projects are not printed on 'show' calls."""
+"""
+Add to hidden project list so that currently unused projects are not printed on 'lst' calls.
+
+$ hideproj PROJECT
+"""
 
 # base imports
 import argparse
 import json
-from pathlib import Path
 
 from task_terminal import lst
 

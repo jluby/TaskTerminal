@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Show projects currently available."""
+"""
+Show projects currently available.
+
+$ lsproj
+"""
 
 # base imports
 import json

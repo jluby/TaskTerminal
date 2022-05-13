@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Delete project."""
+"""
+Delete project.
+
+$ rmproj PROJECT
+"""
 
 # base imports
 import argparse

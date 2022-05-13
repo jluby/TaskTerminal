@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Move project to a new priority position."""
+"""
+Move project in active list to a new position for 'lst'-ing.
+
+$ moveproj FROM_IDX TO_IDX
+"""
 
 import argparse
 import json

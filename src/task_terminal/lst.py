@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Display contents of list."""
+"""
+Display contents of list.
+
+Usage:
+$ lst all LIST
+$ lst PROJECT LIST
+$ lst PROJECT LIST IDX
+"""
 
 # base imports
 import argparse

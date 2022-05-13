@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Move item to list's 'pull_to' location if -U not specified, or to 'push_to' location if -U is specified."""
+"""
+Move item to list's 'pull_to' location if -U not specified, or to 'push_to' location if -U is specified.
+
+$ pull PROJECT FILE IDX
+$ pull PROJECT FILE IDX -U
+"""
 
 # base imports
 import argparse

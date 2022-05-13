@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Add project."""
+"""
+Add project.
+
+Usage:
+$ addproj PROJECT
+"""
 
 # base imports
 import argparse

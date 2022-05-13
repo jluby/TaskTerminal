@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Add item to list."""
+"""
+Add item to list.
+
+Usage:
+$ addto PROJECT LIST
+$ addto PROJECT LIST IDX
+"""
 
 # base imports
 import argparse

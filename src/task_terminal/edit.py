@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Edit list item."""
+"""
+Edit list item.
+
+$ edit PROJECT LIST IDX
+"""
 
 # base imports
 import argparse

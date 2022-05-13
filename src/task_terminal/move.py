@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Move item in list to another position or to tail of another list."""
+"""
+Move item in list to another position or to tail of another list.
+
+$ move PROJECT LIST FROM_IDX TO_IDX
+# move PROJECT FROM_LIST FROM_IDX TO_LIST
+"""
 
 import argparse
 import json
