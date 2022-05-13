@@ -125,7 +125,8 @@ def main(parse_args=True):
     else:
         df = pd.read_csv(f"{data_path}/projects/{d['ref_proj']}/{file}.csv")
         if d["pos"] is None:
-            lines = parse_entries(df, project=proj, file=file, width=WIDTH)
+            lines = parse_entries(df, project=d["ref_proj"], file=file, width=WIDTH)
+            lines += [""]
         else:
             idx = define_idx(d["pos"], df)
             if idx not in list(df.index):
