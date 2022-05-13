@@ -1,7 +1,7 @@
 # TaskTerminal
 TaskTerminal is a package which provides task tracking utilities in Terminal with basic automation to make your TODOs readily accessible and easy to manage.
 
-<img width="402" alt="sample_terminal" src="https://user-images.githubusercontent.com/43190780/167225457-bf7e1848-a7cf-452d-bbd0-79483d4eec3d.png">
+<img width="402" alt="sample_lst" src="https://user-images.githubusercontent.com/43190780/168383804-76c4bb1a-5d55-42db-b143-28067803430f.png">
 
 ## Project Overview
 This project seeks to provide utilities for task tracking. Tasks are seperated by project. The core utilities of this project are:
