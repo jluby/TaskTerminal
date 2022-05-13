@@ -103,7 +103,7 @@ def main(parse_args=True):
     if len(project_list) == 0:
         raise ValueError(
             reformat(
-                f"No projects created. To create a new directory, run {templates['add_template']}.",
+                f"No projects active. To create a new directory, run {templates['add_template']}. To unhide an existing directory, run {templates['unhide_project']}.",
                 input_type="error",
             )
         )
