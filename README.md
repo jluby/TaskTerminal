@@ -55,7 +55,7 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
  3. Re-install the package with `pip install .` to establish configuration options.
 
 ## Usage
- See `tutorial.sh`
+ See file-level docstrings in `src`.
  
 ## Current Maintainers
  * Jack Luby, UChicago Booth Center for Applied AI - jack.o.luby@gmail.com
