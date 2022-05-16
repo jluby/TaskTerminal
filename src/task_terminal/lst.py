@@ -32,6 +32,7 @@ from .helpers.helpers import (
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
 WIDTH = 55
 
+
 def main(parse_args=True):
 
     # establish parameters
@@ -42,9 +43,7 @@ def main(parse_args=True):
     check_scheduled()
 
     # establish parser to pull in projects to view
-    parser = argparse.ArgumentParser(
-        description="Display contents of list or entry."
-    )
+    parser = argparse.ArgumentParser(description="Display contents of list or entry.")
     parser.add_argument(
         "ref_proj",
         type=str,
@@ -81,9 +80,7 @@ def main(parse_args=True):
     else:
         d = vars(parser.parse_args([]))
         if os.path.isfile(last_lst_path):
-            last_lst_params = json.load(
-                open(f"{data_path}/last_lst.json", "r")
-            )
+            last_lst_params = json.load(open(f"{data_path}/last_lst.json", "r"))
             d.update(last_lst_params)
 
     if d["pos"] and d["ref_proj"] in ["all", "ALL"]:
@@ -124,9 +121,7 @@ def main(parse_args=True):
         lines = []
         for proj in project_list:
             df = pd.read_csv(f"{data_path}/projects/{proj}/{file}.csv")
-            proj_lines = parse_entries(
-                df, project=proj, file=file, width=WIDTH
-            )
+            proj_lines = parse_entries(df, project=proj, file=file, width=WIDTH)
             lines += proj_lines
         lines += [""]
     else:

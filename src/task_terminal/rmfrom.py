@@ -67,9 +67,7 @@ def main():
             )
         )
     if not d["ref_proj"]:
-        raise ValueError(
-            reformat(f"'ref_proj' must be provided.", input_type="error")
-        )
+        raise ValueError(reformat(f"'ref_proj' must be provided.", input_type="error"))
     if d["ref_proj"] not in project_list:
         raise ValueError(
             reformat(
@@ -125,9 +123,7 @@ def main():
             additional_width=23,
             max_width=72,
         )
-        confirmed = input(
-            f"\n{q_str}\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}"
-        )
+        confirmed = input(f"\n{q_str}\n{halftab}This action cannot be undone.\n\n{to_be_removed}\n{halftab}")
         while confirmed not in ["y", "Y"] + ["n", "N"]:
             confirmed = input(
                 reformat(
@@ -138,11 +134,7 @@ def main():
         if confirmed in ["y", "Y"]:
             df = df.loc[df.index != idx]
             df.to_csv(path, index=False)
-            print(
-                reformat(
-                    f"{file_name.capitalize()} item {idx} removed successfully."
-                )
-            )
+            print(reformat(f"{file_name.capitalize()} item {idx} removed successfully."))
         else:
             print(reformat("Action cancelled."))
         timed_sleep()

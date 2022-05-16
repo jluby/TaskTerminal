@@ -11,13 +11,7 @@ import json
 
 from task_terminal import lst
 
-from .helpers.helpers import (
-    check_init,
-    data_path,
-    pkg_path,
-    reformat,
-    timed_sleep,
-)
+from .helpers.helpers import check_init, data_path, pkg_path, reformat, timed_sleep
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
@@ -51,18 +45,10 @@ def main():
         input_type="error",
     )
     if not d["project"]:
-        raise ValueError(
-            reformat("Project name must be provided.", input_type="error")
-            + helper_str
-        )
+        raise ValueError(reformat("Project name must be provided.", input_type="error") + helper_str)
     ref_ls = project_list if not d["U"] else hidden_list
     if d["project"] not in ref_ls:
-        raise ValueError(
-            reformat(
-                "Project not found in reference list.", input_type="error"
-            )
-            + helper_str
-        )
+        raise ValueError(reformat("Project not found in reference list.", input_type="error") + helper_str)
 
     if not d["U"]:
         hidden_list.append(d["project"])
@@ -73,11 +59,7 @@ def main():
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
     json.dump(hidden_list, open(f"{data_path}/hidden_project_list.json", "w"))
     type_str = "added to" if not d["U"] else "removed from"
-    print(
-        reformat(
-            f"Project {d['project']} successfully {type_str} hidden list."
-        )
-    )
+    print(reformat(f"Project {d['project']} successfully {type_str} hidden list."))
 
     timed_sleep()
     lst.main(parse_args=False)

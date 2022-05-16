@@ -98,9 +98,7 @@ def main():
             )
         )
     if not d["ref_proj"]:
-        raise ValueError(
-            reformat(f"'ref_proj' must be provided.", input_type="error")
-        )
+        raise ValueError(reformat(f"'ref_proj' must be provided.", input_type="error"))
     if d["ref_proj"] not in project_list:
         raise ValueError(
             reformat(
@@ -118,16 +116,10 @@ def main():
     entry_dict["entry"] = ""
     entry_dict["description"] = ""
     while entry_dict["entry"] == "":
-        entry_dict["entry"] = input(
-            reformat("Provide entry:", input_type="input")
-        )
+        entry_dict["entry"] = input(reformat("Provide entry:", input_type="input"))
     if d["desc"]:
-        entry_dict["description"] = input(
-            reformat("Describe entry:", input_type="input")
-        )
-    entry_dict["datetime_created"] = str(
-        datetime.now().strftime("%m/%d/%Y %H:%M:%S")
-    )
+        entry_dict["description"] = input(reformat("Describe entry:", input_type="input"))
+    entry_dict["datetime_created"] = str(datetime.now().strftime("%m/%d/%Y %H:%M:%S"))
     entry_dict["flagged"] = d["flag"]
 
     if "attrs" in CONFIG[file].keys() and "hours" in CONFIG[file]["attrs"]:
@@ -142,21 +134,11 @@ def main():
                         )
                     )
                 )
-        if (
-            "attrs" in CONFIG[file].keys()
-            and "schedule" in CONFIG[file]["attrs"]
-        ) or d["schedule"]:
+        if ("attrs" in CONFIG[file].keys() and "schedule" in CONFIG[file]["attrs"]) or d["schedule"]:
             if "pull_to" not in CONFIG[file].keys():
-                raise ValueError(
-                    reformat(
-                        "Cannot schedule an entry to a file with no 'pull_to' parameter."
-                    )
-                )
+                raise ValueError(reformat("Cannot schedule an entry to a file with no 'pull_to' parameter."))
             scheduled = ""
-            while (
-                type(scheduled) is not datetime
-                or not scheduled > datetime.now()
-            ):
+            while type(scheduled) is not datetime or not scheduled > datetime.now():
                 with suppress(ValueError):
                     scheduled = input(
                         reformat(
@@ -165,9 +147,7 @@ def main():
                         )
                     )
                     scheduled = reformat_date(scheduled)
-            entry_dict["datetime_scheduled"] = scheduled.strftime(
-                "%m/%d/%Y %H:%M:%S"
-            )
+            entry_dict["datetime_scheduled"] = scheduled.strftime("%m/%d/%Y %H:%M:%S")
 
     df = df.append(entry_dict, ignore_index=True)
     df = move(df, from_index=-1, to_index=define_idx(d["pos"], df))

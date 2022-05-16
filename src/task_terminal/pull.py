@@ -76,10 +76,7 @@ def main():
                 input_type="error",
             )
         )
-    if not all(
-        x in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]
-        for x in d["pos"]
-    ):
+    if not all(x in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)] for x in d["pos"]):
         raise ValueError(
             reformat(
                 f"'pos' entries must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100",
@@ -155,11 +152,7 @@ def main():
         from_df, to_df = transfer_row(idx, from_df, to_df)
         to_df.to_csv(to_path, index=False)
         from_df.to_csv(from_path, index=False)
-        print(
-            reformat(
-                f"{d['file'].capitalize()} item {idx} moved successfully to {to_file.capitalize()}."
-            )
-        )
+        print(reformat(f"{d['file'].capitalize()} item {idx} moved successfully to {to_file.capitalize()}."))
         if "pull_to" not in CONFIG[to_file].keys():
             print(
                 reformat(

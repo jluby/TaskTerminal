@@ -15,14 +15,7 @@ import pandas as pd
 
 from task_terminal import lst
 
-from .helpers.helpers import (
-    CONFIG,
-    check_init,
-    columns,
-    data_path,
-    reformat,
-    timed_sleep,
-)
+from .helpers.helpers import CONFIG, check_init, columns, data_path, reformat, timed_sleep
 
 
 def main():
@@ -42,23 +35,15 @@ def main():
     d = vars(parser.parse_args())
 
     if not d["project"]:
-        raise ValueError(
-            reformat("'project' must be provided.", input_type="error")
-        )
+        raise ValueError(reformat("'project' must be provided.", input_type="error"))
     if os.path.exists(f"{data_path}/projects/{d['project']}"):
-        raise ValueError(
-            reformat(
-                f"Project '{d['project']}' already exists.", input_type="error"
-            )
-        )
+        raise ValueError(reformat(f"Project '{d['project']}' already exists.", input_type="error"))
 
     base_path = f"{data_path}/projects/{d['project']}"
 
     os.makedirs(base_path)
     for file in CONFIG.keys():
-        pd.DataFrame(columns=columns).to_csv(
-            f"{base_path}/{file}.csv", index=False
-        )
+        pd.DataFrame(columns=columns).to_csv(f"{base_path}/{file}.csv", index=False)
 
     project_list.append(d["project"])
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))

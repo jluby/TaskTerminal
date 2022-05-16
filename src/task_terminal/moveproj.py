@@ -10,13 +10,7 @@ import json
 
 from task_terminal import lst
 
-from .helpers.helpers import (
-    check_init,
-    data_path,
-    define_idx,
-    reformat,
-    timed_sleep,
-)
+from .helpers.helpers import check_init, data_path, define_idx, reformat, timed_sleep
 
 # establish parameters
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
@@ -26,9 +20,7 @@ def main():
     check_init()
 
     # establish parser to pull in projects to view
-    parser = argparse.ArgumentParser(
-        description="Move project to a new priority position."
-    )
+    parser = argparse.ArgumentParser(description="Move project to a new priority position.")
     parser.add_argument(
         "from",
         type=str,
@@ -49,11 +41,7 @@ def main():
     del project_list[from_idx]
     project_list.insert(to_idx, proj_to_move)
     json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
-    print(
-        reformat(
-            f"Project {proj_to_move} successfully moved from position {from_idx} to position {to_idx}."
-        )
-    )
+    print(reformat(f"Project {proj_to_move} successfully moved from position {from_idx} to position {to_idx}."))
 
     timed_sleep()
     lst.main(parse_args=False)

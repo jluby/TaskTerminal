@@ -17,9 +17,7 @@ pkg_path = Path(__file__).parents[1]
 data_path = f"{pkg_path}/.package_data"
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
 CONFIG = json.load(open(f"{pkg_path}/helpers/config.json", "r"))
-file_options = list(CONFIG.keys()) + sum(
-    [CONFIG[k]["aliases"] for k in CONFIG.keys()], []
-)
+file_options = list(CONFIG.keys()) + sum([CONFIG[k]["aliases"] for k in CONFIG.keys()], [])
 columns = [
     "entry",
     "description",
@@ -38,16 +36,13 @@ def set_entry_size_manual(height, width):
     os.system(f"printf '\e[8;{height};{width}t'")
 
 
-def set_entry_size(
-    entry, additional_height=6, additional_width=20, min_width=60, max_width=69
-):
+def set_entry_size(entry, additional_height=6, additional_width=20, min_width=60, max_width=69):
     print_width = np.max(
         [
             min_width,
             np.min(
                 [
-                    np.max([len(l) for l in entry.tolist() if type(l) is str])
-                    + additional_width,
+                    np.max([len(l) for l in entry.tolist() if type(l) is str]) + additional_width,
                     max_width,
                 ]
             ),
@@ -99,26 +94,20 @@ def transfer_row(idx, from_df, to_df):
     to_df = to_df.append(to_be_moved.to_dict(), ignore_index=True)
     from_df = from_df.loc[from_df.index != idx]
 
-    to_df.loc[len(to_df) - 1, "datetime_moved"] = datetime.now().strftime(
-        "%m/%d/%Y %H:%M:%S"
-    )
+    to_df.loc[len(to_df) - 1, "datetime_moved"] = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
 
     return from_df, to_df
 
 
 def check_scheduled(project_list=project_list):
 
-    chain_files = [
-        file for file in CONFIG.keys() if "pull_to" in CONFIG[file].keys()
-    ]
+    chain_files = [file for file in CONFIG.keys() if "pull_to" in CONFIG[file].keys()]
 
     moves = {k: 0 for k in project_list}
     for project in project_list:
         for file in chain_files:
             from_path = f"{data_path}/projects/{project}/{file}.csv"
-            to_path = (
-                f"{data_path}/projects/{project}/{CONFIG[file]['pull_to']}.csv"
-            )
+            to_path = f"{data_path}/projects/{project}/{CONFIG[file]['pull_to']}.csv"
             from_df = pd.read_csv(from_path)
             to_df = pd.read_csv(to_path)
 
@@ -126,16 +115,12 @@ def check_scheduled(project_list=project_list):
                 if pd.isna(row["datetime_scheduled"]):
                     pass
                 else:
-                    release_time = datetime.strptime(
-                        row["datetime_scheduled"], "%m/%d/%Y %H:%M:%S"
-                    )
+                    release_time = datetime.strptime(row["datetime_scheduled"], "%m/%d/%Y %H:%M:%S")
                     # Move if past date
                     if release_time < datetime.now():
                         from_df, to_df = transfer_row(idx, from_df, to_df)
                         from_df.to_csv(from_path, index=False)
-                        to_df.loc[
-                            len(to_df) - 1, "datetime_scheduled"
-                        ] = float("NaN")
+                        to_df.loc[len(to_df) - 1, "datetime_scheduled"] = float("NaN")
                         to_df.to_csv(to_path, index=False)
                         moves[project] += 1
 
@@ -203,18 +188,14 @@ def parse_row(string: str, linelen: int = 40) -> list:
     return lines
 
 
-def parse_entries(
-    df: pd.DataFrame, project: str, file: str, width: int
-) -> None:
+def parse_entries(df: pd.DataFrame, project: str, file: str, width: int) -> None:
     """Print all entries in dataframe"""
     lines = []
     lines += ["", project]
     lines.append("-" * width)
     if len(df) > 0:
         for i, row in enumerate(df.to_dict("records")):
-            rowlines_p = process_rowlines(
-                idx=i, row=row, width=width, file=file
-            )
+            rowlines_p = process_rowlines(idx=i, row=row, width=width, file=file)
             lines += rowlines_p
     lines.append("-" * width)
 
@@ -230,9 +211,7 @@ def get_project_stats(project, file):
     hour_str = ""
     if "stats_from_prev" in CONFIG[file].keys():
         prev_file = CONFIG[file]["push_to"]
-        last_df = pd.read_csv(
-            f"{data_path}/projects/{project}/{prev_file}.csv"
-        )
+        last_df = pd.read_csv(f"{data_path}/projects/{project}/{prev_file}.csv")
         stats = {
             "n": len(last_df),
             "total": round(np.nansum(last_df["time_estimate"]), 2),
@@ -241,19 +220,10 @@ def get_project_stats(project, file):
         lst_stats = ["0"] if list(set(lst_stats)) == ["0"] else lst_stats
         stats_str = f"<- {' | '.join(lst_stats)}" if len(lst_stats) > 0 else ""
 
-    if (
-        "attrs" in CONFIG[file].keys()
-        and "show_total" in CONFIG[file]["attrs"]
-    ):
+    if "attrs" in CONFIG[file].keys() and "show_total" in CONFIG[file]["attrs"]:
         current_df = pd.read_csv(f"{data_path}/projects/{project}/{file}.csv")
-        p_hours = (
-            np.nansum(current_df["time_estimate"])
-            if len(current_df) > 1
-            else 0
-        )
-        hour_str = (
-            "T: " + str(round(p_hours, 2)) + "hrs" if p_hours > 0 else ""
-        )
+        p_hours = np.nansum(current_df["time_estimate"]) if len(current_df) > 1 else 0
+        hour_str = "T: " + str(round(p_hours, 2)) + "hrs" if p_hours > 0 else ""
 
     return stats_str, hour_str
 
@@ -268,10 +238,7 @@ def process_rowlines(idx, row, width, file):
     lines = parse_row(row["entry"], linelen=linelen)
 
     lines_p = []
-    lines = [
-        colored(l, "red", attrs=["bold"]) if row["flagged"] else l
-        for l in lines
-    ]
+    lines = [colored(l, "red", attrs=["bold"]) if row["flagged"] else l for l in lines]
     if row["flagged"]:
         linelen -= 13
     if "stat" not in CONFIG[file].keys() or pd.isna(row[CONFIG[file]["stat"]]):
@@ -279,13 +246,9 @@ def process_rowlines(idx, row, width, file):
     else:
         stat = CONFIG[file]["stat"]
         if stat == "time_estimate":
-            lines_p.append(
-                f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{row[stat]}hrs"
-            )
+            lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{row[stat]}hrs")
         elif "datetime" in stat:
-            lines_p.append(
-                f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(row[stat]): >{10}}"
-            )
+            lines_p.append(f"{halftab}{idx: <{5}}{lines[0]: <{linelen}}{halftab}{process_date_str(row[stat]): >{10}}")
 
     for line in lines[1:]:
         lines_p.append(f"{' '*9}{line: <{linelen}}")
@@ -346,9 +309,7 @@ def reformat_date(date_and_time: str):
     if time_str:
         if ":" in time_str:
             p = [v.zfill(2) for v in parse("{}:{}", time_str[:-2])]
-            tm = datetime.strptime(
-                f"{p[0]}:{p[1]}{time_str[-2:]}", "%I:%M%p"
-            ).time()
+            tm = datetime.strptime(f"{p[0]}:{p[1]}{time_str[-2:]}", "%I:%M%p").time()
         else:
             tm = datetime.strptime(f"{time_str}", "%I%p").time()
     else:
@@ -389,14 +350,8 @@ def define_chain(file: str) -> list:
 
 
 def get_prev(file):
-    senders = [
-        f
-        for f in CONFIG.keys()
-        if "pull_to" in CONFIG[f].keys() and CONFIG[f]["pull_to"] == file
-    ]
+    senders = [f for f in CONFIG.keys() if "pull_to" in CONFIG[f].keys() and CONFIG[f]["pull_to"] == file]
     if len(senders) > 1:
-        warnings.warn(
-            f"Multiple files send to the provided file. Using the first in config.json: {senders[0]}."
-        )
+        warnings.warn(f"Multiple files send to the provided file. Using the first in config.json: {senders[0]}.")
     if len(senders) > 0:
         return senders[0]

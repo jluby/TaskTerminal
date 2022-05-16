@@ -13,14 +13,7 @@ from shutil import rmtree
 
 from task_terminal import lst
 
-from .helpers.helpers import (
-    check_init,
-    data_path,
-    halftab,
-    pkg_path,
-    reformat,
-    timed_sleep,
-)
+from .helpers.helpers import check_init, data_path, halftab, pkg_path, reformat, timed_sleep
 
 # establish parameters
 templates = json.load(open(f"{pkg_path}/helpers/templates.json"))
@@ -42,21 +35,13 @@ def main():
     d = vars(parser.parse_args())
 
     if not d["project"]:
-        raise ValueError(
-            reformat("'project' must be provided.", input_type="error")
-        )
+        raise ValueError(reformat("'project' must be provided.", input_type="error"))
     if not os.path.exists(f"{data_path}/projects/{d['project']}"):
-        raise ValueError(
-            reformat(
-                f"Project '{d['project']}' does not exist.", input_type="error"
-            )
-        )
+        raise ValueError(reformat(f"Project '{d['project']}' does not exist.", input_type="error"))
 
     base_path = f"{data_path}/projects/{d['project']}"
     confirmed = None
-    confirmed = input(
-        f"Remove {d['project']}? (y/n)\n{halftab}This action cannot be undone.\n{halftab}"
-    )
+    confirmed = input(f"Remove {d['project']}? (y/n)\n{halftab}This action cannot be undone.\n{halftab}")
     while confirmed not in ["y", "Y"] + ["n", "N"]:
         confirmed = input(
             reformat(
@@ -68,14 +53,10 @@ def main():
         rmtree(base_path)
         if d["project"] in project_list:
             project_list.remove(d["project"])
-            json.dump(
-                project_list, open(f"{data_path}/project_list.json", "w")
-            )
+            json.dump(project_list, open(f"{data_path}/project_list.json", "w"))
         else:
             hidden_list.remove(d["project"])
-            json.dump(
-                hidden_list, open(f"{data_path}/hidden_project_list.json", "w")
-            )
+            json.dump(hidden_list, open(f"{data_path}/hidden_project_list.json", "w"))
         print(reformat(f"Project '{d['project']}' removed successfully."))
 
     timed_sleep()
