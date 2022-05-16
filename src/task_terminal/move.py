@@ -141,8 +141,8 @@ def main():
 
         from_idx = define_idx(d["from"], from_df)
         from_df, to_df = transfer_row(from_idx, from_df, to_df)
-        if ("attrs" in CONFIG[file].keys() and "schedule" in CONFIG[file]["attrs"]) or d["schedule"]:
-            if "pull_to" not in CONFIG[file].keys():
+        if ("attrs" in CONFIG[to_file].keys() and "schedule" in CONFIG[to_file]["attrs"]) or d["schedule"]:
+            if "pull_to" not in CONFIG[to_file].keys():
                 raise ValueError(reformat("Cannot schedule an entry to a file with no 'pull_to' parameter."))
             scheduled = ""
             while type(scheduled) is not datetime or not scheduled > datetime.now():
@@ -154,7 +154,7 @@ def main():
                         )
                     )
                     scheduled = reformat_date(scheduled)
-            to_df[-1, "datetime_scheduled"] = scheduled.strftime("%m/%d/%Y %H:%M:%S")
+            to_df.loc[len(to_df)-1, "datetime_scheduled"] = scheduled.strftime("%m/%d/%Y %H:%M:%S")
         to_df.to_csv(to_path, index=False)
         from_df.to_csv(from_path, index=False)
         print(reformat(f"{from_file.capitalize()} item {from_idx} moved successfully to {to_file.capitalize()}."))
