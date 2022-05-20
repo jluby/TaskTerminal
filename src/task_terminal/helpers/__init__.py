@@ -1,1 +1,1 @@
-""" Get outta here, ya rascal """
+""" Get outta here, ya rascal"""

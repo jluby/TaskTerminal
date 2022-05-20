@@ -189,7 +189,7 @@ def parse_row(string: str, linelen: int = 40) -> list:
 
 
 def parse_entries(df: pd.DataFrame, project: str, file: str, width: int) -> None:
-    """Print all entries in dataframe"""
+    """Print all entries in dataframe."""
     lines = []
     lines += ["", project]
     lines.append("-" * width)
@@ -274,7 +274,7 @@ def define_idx(pos: int, ref_obj) -> int:
 
 
 def move(df: pd.DataFrame, from_index: int, to_index: int) -> pd.DataFrame:
-    """Move DF row from_index to_index"""
+    """Move DF row from_index to_index."""
     idx = list(df.index)
     idx.remove(idx[from_index])
     to_index = to_index if to_index != -1 else len(idx)
@@ -343,10 +343,10 @@ def define_chain(file: str) -> list:
 
         return chain
 
-    next = fill_next(file, [])
+    nxt = fill_next(file, [])
     prev = fill_prev(file, [])
 
-    return prev + next
+    return prev + nxt
 
 
 def get_prev(file):
