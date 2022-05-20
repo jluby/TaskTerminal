@@ -27,9 +27,10 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
 ## Package Installation
 
  To install the `task_terminal` package:
-  1\. Clone this repository.
-  2\. Read the 'Configuration' section and establish a package configuration which will best suit your needs.
-  3\. From the base directory, run `pip install .` from the command line.
+
+  1. Clone this repository.
+  2. Read the 'Configuration' section and establish a package configuration which will best suit your needs.
+  3. From the base directory, run `pip install .` from the command line.
 
 ## Configuration
 
@@ -46,17 +47,22 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
 
 -   `aliases`: `list` - A list of aliases by which file can be identified in CLI commands. These must be unique to each file.
     OPTIONAL: 
+
 -   `pull_to`: `str` - File to which `pull` command will move file.
+
 -   `push_to`: `str` - File to which `pull` command will move file when '-U' flag is provided.
+
 -   `stat`: `str` - Statistic to be displayed at the task-level. These will typically be one of 'time_estimate', indicating how long the task is expected to take, or 'datetime_scheduled', indicating the date at which the task is to be moved to its 'pull_to' file.
+
 -   `attrs`: `list` - Optional attributes for display of file lists. These can be chosen from:
-    'show_total': show the sum of a project list's 'time_estimate' values
-    'hours': Ask for a 'time_estimate' when a task is created within that list
-    'schedule': Ask for a 'datetime_scheduled' at which a task will be moved to its 'pull_to' file
+    -   'show_total': show the sum of a project list's 'time_estimate' values
+    -   'hours': Ask for a 'time_estimate' when a task is created within that list
+    -   'schedule': Ask for a 'datetime_scheduled' at which a task will be moved to its 'pull_to' file
+
 -   `stats_from_prev`: `list` - Statistics to be shown from a file's 'push_to' location. These can be chosen from:
-     'n': Number of tasks in the preceding list
-     'total': The sum of the preceding list's 'time_estimate' values
-    A fully established `config.json` file might look something like this:
+    -   'n': Number of tasks in the preceding list
+    -   'total': The sum of the preceding list's 'time_estimate' values
+        A fully established `config.json` file might look something like this:
 
 <img width="372" alt="full_config" src="https://user-images.githubusercontent.com/43190780/167225752-f7e63a9b-cfe2-4028-b4c9-ca159e68579e.png">
 
