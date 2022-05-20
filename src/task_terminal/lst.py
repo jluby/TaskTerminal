@@ -86,14 +86,14 @@ def main(parse_args=True):
     if d["pos"] and d["ref_proj"] in ["all", "ALL"]:
         raise ValueError(
             reformat(
-                f"Use of 'pos' kwarg requires specification of a single project.",
+                "Use of 'pos' kwarg requires specification of a single project.",
                 input_type="error",
             )
         )
     if d["pos"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
         raise ValueError(
             reformat(
-                f"'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.",
+                "'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.",
                 input_type="error",
             )
         )

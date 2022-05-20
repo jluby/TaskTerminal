@@ -86,7 +86,7 @@ def main():
     if d["pos"] not in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)]:
         raise ValueError(
             reformat(
-                f"'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.",
+                "'pos' must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100.",
                 input_type="error",
             )
         )
@@ -98,7 +98,7 @@ def main():
             )
         )
     if not d["ref_proj"]:
-        raise ValueError(reformat(f"'ref_proj' must be provided.", input_type="error"))
+        raise ValueError(reformat("'ref_proj' must be provided.", input_type="error"))
     if d["ref_proj"] not in project_list:
         raise ValueError(
             reformat(

@@ -72,14 +72,14 @@ def main():
     if not d["ref_proj"] or not d["pos"]:
         raise ValueError(
             reformat(
-                f"'ref_proj' and at least one 'pos' must be provided.",
+                "'ref_proj' and at least one 'pos' must be provided.",
                 input_type="error",
             )
         )
     if not all(x in [None, "HEAD", "TAIL"] + [str(i) for i in range(100)] for x in d["pos"]):
         raise ValueError(
             reformat(
-                f"'pos' entries must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100",
+                "'pos' entries must be one of 'HEAD', 'TAIL', 0, or a positive integer less than 100",
                 input_type="error",
             )
         )

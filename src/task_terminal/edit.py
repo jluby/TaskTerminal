@@ -80,7 +80,7 @@ def main():
             )
         )
     if not d["ref_proj"]:
-        raise ValueError(reformat(f"'ref_proj' must be provided.", input_type="error"))
+        raise ValueError(reformat("'ref_proj' must be provided.", input_type="error"))
     if d["ref_proj"] not in project_list:
         raise ValueError(
             reformat(

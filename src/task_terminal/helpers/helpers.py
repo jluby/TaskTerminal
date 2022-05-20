@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from dateutil.relativedelta import relativedelta
-from parse import *
+from parse import parse
 from termcolor import colored
 
 pkg_path = Path(__file__).parents[1]

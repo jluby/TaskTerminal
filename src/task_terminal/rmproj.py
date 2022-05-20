@@ -45,7 +45,7 @@ def main():
     while confirmed not in ["y", "Y"] + ["n", "N"]:
         confirmed = input(
             reformat(
-                f"Accepted inputs are ['y', 'Y', 'n', 'N'].",
+                "Accepted inputs are ['y', 'Y', 'n', 'N'].",
                 input_type="input",
             )
         )

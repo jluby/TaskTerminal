@@ -67,7 +67,7 @@ def main():
             )
         )
     if not d["ref_proj"]:
-        raise ValueError(reformat(f"'ref_proj' must be provided.", input_type="error"))
+        raise ValueError(reformat("'ref_proj' must be provided.", input_type="error"))
     if d["ref_proj"] not in project_list:
         raise ValueError(
             reformat(
@@ -127,7 +127,7 @@ def main():
         while confirmed not in ["y", "Y"] + ["n", "N"]:
             confirmed = input(
                 reformat(
-                    f"Accepted inputs are ['y', 'Y', 'n', 'N'].",
+                    "Accepted inputs are ['y', 'Y', 'n', 'N'].",
                     input_type="input",
                 )
             )
