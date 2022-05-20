@@ -28,9 +28,9 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
 
  To install the `task_terminal` package:
 
-  1. Clone this repository.
-  2. Read the 'Configuration' section and establish a package configuration which will best suit your needs.
-  3. From the base directory, run `pip install .` from the command line.
+1.  Clone this repository.
+2.  Read the 'Configuration' section and establish a package configuration which will best suit your needs.
+3.  From the base directory, run `pip install .` from the command line.
 
 ## Configuration
 
@@ -43,10 +43,12 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
 -   NOTE: It is recommended that file types be set prior to establishing task entries. Users should be aware that entries within a given file would likely be lost upon package re-configuration.
 
 2.  Establish file-level attributes. As values paired to their corresponding files, these attributes will be contained in their own dictionary. Available attributes are:
-    REQUIRED:
+
+REQUIRED:
 
 -   `aliases`: `list` - A list of aliases by which file can be identified in CLI commands. These must be unique to each file.
-    OPTIONAL: 
+
+OPTIONAL: 
 
 -   `pull_to`: `str` - File to which `pull` command will move file.
 
