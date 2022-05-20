@@ -10,7 +10,6 @@ import argparse
 import json
 from contextlib import suppress
 from datetime import datetime
-from multiprocessing.sharedctypes import Value
 
 import pandas as pd
 from termcolor import colored
