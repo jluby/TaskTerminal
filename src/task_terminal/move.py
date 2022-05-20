@@ -153,7 +153,7 @@ def main():
                         )
                     )
                     scheduled = reformat_date(scheduled)
-            to_df.loc[len(to_df)-1, "datetime_scheduled"] = scheduled.strftime("%m/%d/%Y %H:%M:%S")
+            to_df.loc[len(to_df) - 1, "datetime_scheduled"] = scheduled.strftime("%m/%d/%Y %H:%M:%S")
         to_df.to_csv(to_path, index=False)
         from_df.to_csv(from_path, index=False)
         print(reformat(f"{from_file.capitalize()} item {from_idx} moved successfully to {to_file.capitalize()}."))

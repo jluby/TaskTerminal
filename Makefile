@@ -1,14 +1,13 @@
 #!/usr/bin/make -f
 SHELL = /bin/sh
-include config.mk
 .DELETE_ON_ERROR:
 
 # boilerplate variables, do not edit
 MAKEFILE_PATH := $(abspath $(firstword $(MAKEFILE_LIST)))
 MAKEFILE_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-# required values, set to defaults here if not given in config.mk
-PACKAGE_DIR ?= task_terminal
+# required values
+PACKAGE_DIR ?= src
 LINTING_LINELENGTH ?= 120
 PYTHON ?= python3
 CODECOV_TOKEN ?= ${CODECOV_TOKEN}
@@ -74,3 +73,9 @@ lint-py: clean
 		--trailing-comma \
 		$(CLEAN_DIR_LIST_INCLUDED)
 lint: lint-py
+
+## autoflake :		delete unused imports.
+.PHONY: autoflake flake
+autoflake:
+	autoflake -r --in-place --remove-all-unused-imports $(CLEAN_DIR_LIST_INCLUDED)
+flake: autoflake
