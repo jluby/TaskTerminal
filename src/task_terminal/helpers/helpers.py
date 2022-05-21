@@ -216,9 +216,9 @@ def get_project_stats(project, file):
             "n": len(last_df),
             "total": round(np.nansum(last_df["time_estimate"]), 2),
         }
-        lst_stats = [str(stats[c]) for c in CONFIG[file]["stats_from_prev"]]
-        lst_stats = ["0"] if list(set(lst_stats)) == ["0"] else lst_stats
-        stats_str = f"<- {' | '.join(lst_stats)}" if len(lst_stats) > 0 else ""
+        lst_stats = [str(stats[c]) if str(stats[c])[-1] != "0" else str(stats[c])[:-2] for c in CONFIG[file]["stats_from_prev"]]
+        prev_str = "0" if len(lst_stats) == 0 else ' | '.join(lst_stats)
+        stats_str = f"<- {prev_str}"
 
     if "attrs" in CONFIG[file].keys() and "show_total" in CONFIG[file]["attrs"]:
         current_df = pd.read_csv(f"{data_path}/projects/{project}/{file}.csv")

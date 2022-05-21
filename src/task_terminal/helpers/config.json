@@ -10,7 +10,6 @@
     {
         "aliases": ["b", "back"],
         "stat": "time_estimate",
-        "stats_from_prev": ["n"],
         "pull_to": "tasks",
         "push_to": "scheduled",
         "attrs": ["hours", "show_total"]
@@ -19,7 +18,7 @@
     {
         "aliases": ["t", "task"],
         "stat": "time_estimate",
-        "stats_from_prev": ["n", "total"],
+        "stats_from_prev": ["n"],
         "pull_to": "archives",
         "push_to": "backburner",
         "attrs": ["hours", "show_total"]
