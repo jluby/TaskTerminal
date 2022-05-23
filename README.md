@@ -1,12 +1,12 @@
 # TaskTerminal
 
-TaskTerminal is a package which provides task tracking utilities in Terminal with basic automation to make your TODOs readily accessible and easy to manage.
+TaskTerminal is a package which provides task tracking utilities in Terminal with basic automation to make your Kanban workflow readily accessible, efficient, and easy to manage. Lists are intentionally segmented to facilitate focus on the default (typically the active) task list.
 
 <img width="402" alt="sample_lst" src="https://user-images.githubusercontent.com/43190780/168383804-76c4bb1a-5d55-42db-b143-28067803430f.png">
 
 ## Project Overview
 
-This project seeks to provide utilities for task tracking. Tasks are seperated by project. The core utilities of this project are:
+This project seeks to provide utilities for Kanban task tracking. Tasks are seperated by project. The core utilities of this project are:
 
 -   Create entries then store to project-specific, user-specified lists
 -   View / sort lists, including user-provided task descriptions
@@ -42,7 +42,9 @@ This project seeks to provide utilities for task tracking. Tasks are seperated b
 
 -   NOTE: It is recommended that file types be set prior to establishing task entries. Users should be aware that entries within a given file would likely be lost upon package re-configuration.
 
-2.  Establish file-level attributes. As values paired to their corresponding files, these attributes will be contained in their own dictionary. Available attributes are:
+2. Establish the default file. This will be the default when the simple command `$ lst` is entered into the command line.
+
+3.  Establish file-level attributes. As values paired to their corresponding files, these attributes will be contained in their own dictionary. Available attributes are:
 
 REQUIRED:
 
@@ -68,7 +70,7 @@ OPTIONAL:
 
 <img width="372" alt="full_config" src="https://user-images.githubusercontent.com/43190780/167225752-f7e63a9b-cfe2-4028-b4c9-ca159e68579e.png">
 
-3.  Re-install the package with `pip install .` to establish configuration options.
+4.  Re-install the package with `pip install .` to establish configuration options.
 
 ## Usage
 

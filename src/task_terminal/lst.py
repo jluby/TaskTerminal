@@ -16,6 +16,7 @@ import os
 import pandas as pd
 
 from .helpers.helpers import (
+    DEFAULT_FILE,
     check_init,
     check_scheduled,
     data_path,
@@ -56,7 +57,7 @@ def main(parse_args=True):
         "file",
         type=str,
         nargs="?",
-        default="tasks",
+        default=DEFAULT_FILE,
         choices=file_options,
         help="List to display within project.",
     )

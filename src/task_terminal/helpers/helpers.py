@@ -16,7 +16,9 @@ from termcolor import colored
 pkg_path = Path(__file__).parents[1]
 data_path = f"{pkg_path}/.package_data"
 project_list = json.load(open(f"{data_path}/project_list.json", "r"))
-CONFIG = json.load(open(f"{pkg_path}/helpers/config.json", "r"))
+CONFIG_FULL = json.load(open(f"{pkg_path}/helpers/config.json", "r"))
+DEFAULT_FILE = CONFIG_FULL["default"]
+CONFIG = CONFIG_FULL["files"]
 file_options = list(CONFIG.keys()) + sum([CONFIG[k]["aliases"] for k in CONFIG.keys()], [])
 columns = [
     "entry",

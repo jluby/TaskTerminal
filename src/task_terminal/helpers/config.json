@@ -1,42 +1,45 @@
 {
-    "scheduled": 
-    {
-        "aliases": ["s", "schedule"],
-        "stat": "datetime_scheduled",
-        "pull_to": "tasks",
-        "attrs": ["hours", "schedule"]
+    "files": {
+        "scheduled": 
+        {
+            "aliases": ["s", "schedule"],
+            "stat": "datetime_scheduled",
+            "pull_to": "tasks",
+            "attrs": ["hours", "schedule"]
+        },
+        "backburner": 
+        {
+            "aliases": ["b", "back"],
+            "stat": "time_estimate",
+            "pull_to": "tasks",
+            "push_to": "scheduled",
+            "attrs": ["hours", "show_total"]
+        },
+        "tasks":
+        {
+            "aliases": ["t", "task"],
+            "stat": "time_estimate",
+            "stats_from_prev": ["n"],
+            "pull_to": "archives",
+            "push_to": "backburner",
+            "attrs": ["hours", "show_total"]
+        },
+        "archives":
+        {
+            "aliases": ["a", "archive"],
+            "stat": "datetime_moved",
+            "push_to": "tasks"
+        },
+        "notes":
+        {
+            "aliases": ["n", "note"]
+        },
+        "refs":
+        {
+            "aliases": ["r", "ref"]
+        }
     },
-    "backburner": 
-    {
-        "aliases": ["b", "back"],
-        "stat": "time_estimate",
-        "pull_to": "tasks",
-        "push_to": "scheduled",
-        "attrs": ["hours", "show_total"]
-    },
-    "tasks":
-    {
-        "aliases": ["t", "task"],
-        "stat": "time_estimate",
-        "stats_from_prev": ["n"],
-        "pull_to": "archives",
-        "push_to": "backburner",
-        "attrs": ["hours", "show_total"]
-    },
-    "archives":
-    {
-        "aliases": ["a", "archive"],
-        "stat": "datetime_moved",
-        "push_to": "tasks"
-    },
-    "notes":
-    {
-        "aliases": ["n", "note"]
-    },
-    "refs":
-    {
-        "aliases": ["r", "ref"]
-    }
+    "default": "tasks"
 }
 
 
